@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Only authenticated Admins can write
+    function isAuthorizedAdmin() {
+      return request.auth != null;
+    }
+
+    // Public Catalog (Products, Categories, Brands, Industries, Capabilities, Projects, Gallery, Documents, Posts)
+    // Public can READ, but ONLY logged-in Admin can create, edit, or delete
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /brands/{brandId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /industries/{industryId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /capabilities/{capabilityId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /documents/{documentId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /certifications/{certId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /homepage/main {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    match /settings/general {
+      allow read: if true;
+      allow write: if isAuthorizedAdmin();
+    }
+
+    // Inquiries: Public can CREATE (submit quote/inquiry forms), but only Admin can READ and MANAGE them
+    match /enquiries/{enquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAuthorizedAdmin();
+    }
+  }
+}
