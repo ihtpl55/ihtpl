@@ -27,7 +27,7 @@ const setCachedSettings = (settings: SiteSettings) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
 };
 
-export const getSiteSettings = async (): Promise<SiteSettings> => {
+export const getSiteSettings = async (forceFresh = false): Promise<SiteSettings> => {
   // If running on demo data, return cached or initial values instantly
   if (USE_DEMO_DATA) {
     return getCachedSettings();
@@ -37,23 +37,39 @@ export const getSiteSettings = async (): Promise<SiteSettings> => {
     return initialSiteSettings;
   }
 
-  // Background fetch logic: Return cached value immediately, but update in the background
-  const cached = getCachedSettings();
-  
-  // Perform asynchronous fetch from Firestore
-  const docRef = doc(db, 'settings', 'general');
-  getDoc(docRef)
-    .then((snap) => {
-      if (snap.exists()) {
-        const freshData = snap.data() as SiteSettings;
-        setCachedSettings(freshData);
-      }
-    })
-    .catch((err) => {
-      console.warn('Failed to background fetch site settings', err);
-    });
+  const hasLocal = localStorage.getItem(STORAGE_KEY) !== null || memoryCache !== null;
 
-  return cached;
+  // If cached and fresh fetch not explicitly requested, return cached immediately and sync in background
+  if (hasLocal && !forceFresh) {
+    const docRef = doc(db, 'settings', 'general');
+    getDoc(docRef)
+      .then((snap) => {
+        if (snap.exists()) {
+          const freshData = snap.data() as SiteSettings;
+          setCachedSettings(freshData);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to background fetch site settings', err);
+      });
+
+    return getCachedSettings();
+  }
+
+  // Directly await live data from Firestore
+  try {
+    const docRef = doc(db, 'settings', 'general');
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const freshData = snap.data() as SiteSettings;
+      setCachedSettings(freshData);
+      return freshData;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch site settings from Firestore, using cache', err);
+  }
+
+  return getCachedSettings();
 };
 
 export const updateSiteSettings = async (settings: SiteSettings): Promise<void> => {

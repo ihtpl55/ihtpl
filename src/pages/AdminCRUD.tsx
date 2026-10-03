@@ -36,7 +36,7 @@ export const AdminCRUD: React.FC = () => {
     setMessage('');
 
     if (entity === 'settings') {
-      const settings = await getSiteSettings();
+      const settings = await getSiteSettings(true);
       setSettingsItem(settings);
     } else {
       const catList = await getCategories(false);

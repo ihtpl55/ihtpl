@@ -3,7 +3,7 @@ import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 
-export const USE_DEMO_DATA = import.meta.env.VITE_USE_DEMO_DATA === 'true' || import.meta.env.VITE_USE_DEMO_DATA === undefined;
+export const USE_DEMO_DATA = import.meta.env.VITE_USE_DEMO_DATA === 'true';
 
 export interface FirebaseConfigStatus {
   isConfigured: boolean;
