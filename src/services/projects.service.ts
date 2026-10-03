@@ -1,13 +1,12 @@
 import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { Project } from '../types';
-import { initialProjects } from '../data/seedData';
 
-const STORAGE_KEY = 'apex_projects';
+const STORAGE_KEY = 'infinite_projects';
 
 const getLocalProjects = (): Project[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : initialProjects;
+  return saved ? JSON.parse(saved) : [];
 };
 
 export const getProjects = async (publicOnly = true): Promise<Project[]> => {

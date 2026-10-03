@@ -1,7 +1,21 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { SiteSettings } from '../types';
-import { initialSiteSettings } from '../data/seedData';
+
+const emptySettings: SiteSettings = {
+  companyName: 'Infinite Hardware Technology (P) Ltd.',
+  tagline: 'Bridge Bearings • Expansion Joints • Couplings',
+  logoUrl: '/logo.jpg',
+  phone: '',
+  altPhone: '',
+  email: '',
+  whatsapp: '',
+  address: '',
+  businessHours: '',
+  googleMapsUrl: '',
+  footerDescription: '',
+  copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
+};
 
 const STORAGE_KEY = 'infinite_site_settings_cache';
 let memoryCache: SiteSettings | null = null;
@@ -15,10 +29,10 @@ const getCachedSettings = (): SiteSettings => {
       memoryCache = JSON.parse(local);
       return memoryCache!;
     } catch {
-      return initialSiteSettings;
+      return emptySettings;
     }
   }
-  return initialSiteSettings;
+  return emptySettings;
 };
 
 // Helper to set local cache
@@ -34,7 +48,7 @@ export const getSiteSettings = async (forceFresh = false): Promise<SiteSettings>
   }
 
   if (!db) {
-    return initialSiteSettings;
+    return emptySettings;
   }
 
   const hasLocal = localStorage.getItem(STORAGE_KEY) !== null || memoryCache !== null;

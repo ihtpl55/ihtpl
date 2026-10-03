@@ -1,13 +1,12 @@
 import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { Product } from '../types';
-import { initialProducts } from '../data/seedData';
 
-const STORAGE_KEY = 'apex_products';
+const STORAGE_KEY = 'infinite_products';
 
 const getLocalProducts = (): Product[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : initialProducts;
+  return saved ? JSON.parse(saved) : [];
 };
 
 export const getProducts = async (publicOnly = true): Promise<Product[]> => {

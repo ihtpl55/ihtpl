@@ -1,13 +1,12 @@
 import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { GalleryItem } from '../types';
-import { initialGalleryItems } from '../data/seedData';
 
-const STORAGE_KEY = 'apex_gallery';
+const STORAGE_KEY = 'infinite_gallery';
 
 const getLocalGallery = (): GalleryItem[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : initialGalleryItems;
+  return saved ? JSON.parse(saved) : [];
 };
 
 export const getGalleryItems = async (publicOnly = true): Promise<GalleryItem[]> => {

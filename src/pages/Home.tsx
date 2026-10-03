@@ -27,26 +27,39 @@ import {
   Certification,
   BlogPost,
 } from '../types';
-import {
-  initialHomepageConfig,
-  initialCategories,
-  initialProducts,
-  initialIndustries,
-  initialCapabilities,
-  initialProjects,
-  initialCertifications,
-  initialBlogPosts,
-} from '../data/seedData';
+const defaultHomepageConfig: HomepageConfig = {
+  heroEyebrow: 'ENGINEERED HEAVY INFRASTRUCTURE',
+  heroHeading: 'Precision Bridge Bearings & Expansion Joints',
+  heroDescription: 'Infinite Hardware Technology (P) Ltd. manufactures and delivers heavy-duty bridge bearings, expansion joints, structural couplings, and infrastructure solutions built for mission-critical reliability.',
+  heroImage: '/logo.jpg',
+  primaryCtaText: 'Explore Product Catalog',
+  primaryCtaLink: '/products',
+  secondaryCtaText: 'Request Technical Quote',
+  secondaryCtaLink: '/contact',
+  trustMetrics: [
+    { value: '25+', label: 'Years Experience' },
+    { value: '500+', label: 'Infrastructure Projects' },
+    { value: '100%', label: 'Field Quality Tested' },
+    { value: '24/7', label: 'Technical Field Support' },
+  ],
+  companyHeading: 'Engineering Strength for Nation Building',
+  companyBody: 'Specialized manufacturers of structural bridge bearings, expansion joints, and industrial coupling mechanisms adhering to strict international engineering tolerances.',
+  companyImage: '/logo.jpg',
+  finalCtaHeading: 'Ready to Engineer Your Next Infrastructure Project?',
+  finalCtaDescription: 'Connect with our structural engineering team for technical specifications and project quotes.',
+  finalCtaButtonText: 'Request Project Quote',
+  finalCtaButtonLink: '/contact',
+};
 
 export const Home: React.FC = () => {
-  const [config, setConfig] = useState<HomepageConfig>(initialHomepageConfig);
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>(initialProducts.filter(p => p.featured));
-  const [industries, setIndustries] = useState<Industry[]>(initialIndustries);
-  const [capabilities, setCapabilities] = useState<Capability[]>(initialCapabilities);
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
-  const [certifications, setCertifications] = useState<Certification[]>(initialCertifications);
-  const [posts, setPosts] = useState<BlogPost[]>(initialBlogPosts);
+  const [config, setConfig] = useState<HomepageConfig>(defaultHomepageConfig);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [capabilities, setCapabilities] = useState<Capability[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

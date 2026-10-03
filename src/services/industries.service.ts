@@ -1,13 +1,12 @@
 import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { Industry } from '../types';
-import { initialIndustries } from '../data/seedData';
 
-const STORAGE_KEY = 'apex_industries';
+const STORAGE_KEY = 'infinite_industries';
 
 const getLocalIndustries = (): Industry[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : initialIndustries;
+  return saved ? JSON.parse(saved) : [];
 };
 
 export const getIndustries = async (publicOnly = true): Promise<Industry[]> => {

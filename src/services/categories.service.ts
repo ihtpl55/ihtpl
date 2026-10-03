@@ -1,13 +1,12 @@
 import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { Category } from '../types';
-import { initialCategories } from '../data/seedData';
 
-const STORAGE_KEY = 'apex_categories';
+const STORAGE_KEY = 'infinite_categories';
 
 const getLocalCategories = (): Category[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : initialCategories;
+  return saved ? JSON.parse(saved) : [];
 };
 
 export const getCategories = async (publicOnly = true): Promise<Category[]> => {

@@ -1,13 +1,12 @@
 import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { Certification } from '../types';
-import { initialCertifications } from '../data/seedData';
 
-const STORAGE_KEY = 'apex_certifications';
+const STORAGE_KEY = 'infinite_certifications';
 
 const getLocalCertifications = (): Certification[] => {
   const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : initialCertifications;
+  return saved ? JSON.parse(saved) : [];
 };
 
 export const getCertifications = async (publicOnly = true): Promise<Certification[]> => {

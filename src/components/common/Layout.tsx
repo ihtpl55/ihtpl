@@ -6,11 +6,25 @@ import { SearchModal } from './SearchModal';
 import { getSiteSettings } from '../../services/settings.service';
 import { configStatus, USE_DEMO_DATA } from '../../lib/firebase';
 import { SiteSettings } from '../../types';
-import { initialSiteSettings } from '../../data/seedData';
 import { AlertTriangle } from 'lucide-react';
 
+const emptySettings: SiteSettings = {
+  companyName: 'Infinite Hardware Technology (P) Ltd.',
+  tagline: 'Bridge Bearings • Expansion Joints • Couplings',
+  logoUrl: '/logo.jpg',
+  phone: '',
+  altPhone: '',
+  email: '',
+  whatsapp: '',
+  address: '',
+  businessHours: '',
+  googleMapsUrl: '',
+  footerDescription: '',
+  copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
+};
+
 export const Layout: React.FC = () => {
-  const [settings, setSettings] = useState<SiteSettings>(initialSiteSettings);
+  const [settings, setSettings] = useState<SiteSettings>(emptySettings);
   const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {

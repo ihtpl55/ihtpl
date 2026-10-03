@@ -4,11 +4,25 @@ import { ChevronRight, Phone, Mail, MapPin, Clock, Send, ShieldCheck, CheckCircl
 import { submitEnquiry } from '../services/enquiries.service';
 import { getSiteSettings } from '../services/settings.service';
 import { SiteSettings } from '../types';
-import { initialSiteSettings } from '../data/seedData';
+
+const emptySettings: SiteSettings = {
+  companyName: 'Infinite Hardware Technology (P) Ltd.',
+  tagline: 'Bridge Bearings • Expansion Joints • Couplings',
+  logoUrl: '/logo.jpg',
+  phone: '',
+  altPhone: '',
+  email: '',
+  whatsapp: '',
+  address: '',
+  businessHours: '',
+  googleMapsUrl: '',
+  footerDescription: '',
+  copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
+};
 
 export const Contact: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const [settings, setSettings] = useState<SiteSettings>(initialSiteSettings);
+  const [settings, setSettings] = useState<SiteSettings>(emptySettings);
   const [formData, setFormData] = useState({
     name: '',
     company: '',
