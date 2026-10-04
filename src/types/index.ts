@@ -102,7 +102,7 @@ export interface GalleryItem {
   sortOrder: number;
 }
 
-export type DocumentCategory = 'Certifications' | 'Approvals' | 'Company Documents' | 'Catalogues' | 'Technical Documents' | 'Policies';
+export type DocumentCategory = 'Certifications' | 'Approvals' | 'Company Documents' | 'Catalogues' | 'Technical Documents' | 'Policies' | (string & {});
 
 export interface DocumentItem {
   id: string;

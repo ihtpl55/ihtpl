@@ -23,6 +23,8 @@ export const AdminCRUD: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [message, setMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCustomDocCat, setIsCustomDocCat] = useState(false);
+  const [customDocCatInput, setCustomDocCatInput] = useState('');
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -34,6 +36,8 @@ export const AdminCRUD: React.FC = () => {
     setEditingItem(null);
     setSettingsItem(null);
     setMessage('');
+    setIsCustomDocCat(false);
+    setCustomDocCatInput('');
 
     if (entity === 'settings') {
       const settings = await getSiteSettings(true);
@@ -57,6 +61,17 @@ export const AdminCRUD: React.FC = () => {
       }
     }
   };
+
+  const existingDocCategories = Array.from(
+    new Set([
+      'Certifications',
+      'Catalogues',
+      'Technical Documents',
+      'Approvals',
+      'Company Documents',
+      ...items.map((i: any) => i.category).filter(Boolean),
+    ])
+  );
 
   const handleSlugGen = (name: string) => {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -88,6 +103,8 @@ export const AdminCRUD: React.FC = () => {
     } else if (entity === 'projects') {
       setEditingItem({ title: '', slug: '', industry: 'Bridges & Roads', location: '', year: new Date().getFullYear().toString(), shortResult: '', challenge: '', solution: '', outcome: '', heroImage: '', published: true });
     } else if (entity === 'documents') {
+      setIsCustomDocCat(false);
+      setCustomDocCatInput('');
       setEditingItem({ title: '', category: 'Catalogues', fileUrl: '', fileType: 'PDF', size: '1.0 MB', published: true });
     }
   };
@@ -345,20 +362,62 @@ export const AdminCRUD: React.FC = () => {
             {entity === 'documents' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                    Document Category *
-                  </label>
-                  <select
-                    value={editingItem.category || 'Catalogues'}
-                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
-                  >
-                    <option value="Certifications">Certifications</option>
-                    <option value="Catalogues">Catalogues</option>
-                    <option value="Technical Documents">Technical Documents</option>
-                    <option value="Approvals">Approvals</option>
-                    <option value="Company Documents">Company Documents</option>
-                  </select>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-industrial-dark uppercase tracking-wider">
+                      Document Category *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = !isCustomDocCat;
+                        setIsCustomDocCat(next);
+                        if (next) {
+                          setCustomDocCatInput('');
+                          setEditingItem({ ...editingItem, category: '' });
+                        } else {
+                          setEditingItem({ ...editingItem, category: existingDocCategories[0] || 'Catalogues' });
+                        }
+                      }}
+                      className="text-[11px] text-industrial-orange hover:underline font-bold"
+                    >
+                      {isCustomDocCat ? '← Pick from list' : '+ Type New Category'}
+                    </button>
+                  </div>
+
+                  {isCustomDocCat ? (
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Test Reports, Guidelines..."
+                      value={customDocCatInput}
+                      onChange={(e) => {
+                        setCustomDocCatInput(e.target.value);
+                        setEditingItem({ ...editingItem, category: e.target.value });
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-industrial-orange rounded focus:outline-none"
+                    />
+                  ) : (
+                    <select
+                      value={editingItem.category || 'Catalogues'}
+                      onChange={(e) => {
+                        if (e.target.value === '__NEW__') {
+                          setIsCustomDocCat(true);
+                          setCustomDocCatInput('');
+                          setEditingItem({ ...editingItem, category: '' });
+                        } else {
+                          setEditingItem({ ...editingItem, category: e.target.value });
+                        }
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                    >
+                      {existingDocCategories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__NEW__">+ Type a new category...</option>
+                    </select>
+                  )}
                 </div>
                 <div>
                   <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
@@ -578,7 +637,7 @@ export const AdminCRUD: React.FC = () => {
                       </td>
                       <td className="p-3 text-right space-x-1 whitespace-nowrap">
                         <button
-                          onClick={() => { setIsNew(false); setEditingItem(item); }}
+                          onClick={() => { setIsNew(false); setIsCustomDocCat(false); setCustomDocCatInput(''); setEditingItem(item); }}
                           className="p-1.5 bg-industrial-light text-industrial-dark hover:bg-industrial-orange hover:text-white rounded transition-colors inline-flex items-center"
                           title="Edit Entry"
                         >

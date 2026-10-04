@@ -18,7 +18,8 @@ export const DocumentCenter: React.FC = () => {
     });
   }, []);
 
-  const categories = ['All', 'Certifications', 'Catalogues', 'Technical Documents', 'Approvals', 'Company Documents'];
+  const defaultCategories = ['Certifications', 'Catalogues', 'Technical Documents', 'Approvals', 'Company Documents'];
+  const categories = ['All', ...Array.from(new Set([...defaultCategories, ...documents.map(d => d.category).filter(Boolean)]))];
 
   const filteredDocs = documents.filter((doc) => {
     if (selectedCat !== 'All' && doc.category !== selectedCat) return false;
