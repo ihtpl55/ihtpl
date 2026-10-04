@@ -10,6 +10,19 @@ import { auth, AUTHORIZED_ADMIN_UID, USE_DEMO_DATA } from '../lib/firebase';
 
 const DEMO_ADMIN_KEY = 'apex_demo_admin_auth';
 
+const ALLOWED_ADMIN_EMAILS = [
+  'theihtpladmin@gmail.com',
+  import.meta.env.VITE_ADMIN_EMAIL,
+]
+  .filter(Boolean)
+  .map((e) => (e as string).toLowerCase());
+
+const isEmailAuthorized = (userEmail?: string | null): boolean => {
+  if (ALLOWED_ADMIN_EMAILS.length === 0) return true;
+  if (!userEmail) return false;
+  return ALLOWED_ADMIN_EMAILS.includes(userEmail.toLowerCase());
+};
+
 export const isDemoAuthenticated = (): boolean => {
   return localStorage.getItem(DEMO_ADMIN_KEY) === 'true';
 };
@@ -20,16 +33,20 @@ export const loginAdmin = async (email: string, pass: string): Promise<{ success
       localStorage.setItem(DEMO_ADMIN_KEY, 'true');
       return { success: true };
     }
-    return { success: false, error: 'Invalid admin credentials. Use demo: admin@apexindustrial.in / admin123' };
+    return { success: false, error: 'Invalid admin credentials.' };
   }
 
   if (!auth) throw new Error('Firebase Auth not initialized');
 
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
+    if (!isEmailAuthorized(cred.user.email)) {
+      await firebaseSignOut(auth);
+      return { success: false, error: 'Access Denied: This email account is not authorized for CMS admin access.' };
+    }
     if (AUTHORIZED_ADMIN_UID && cred.user.uid !== AUTHORIZED_ADMIN_UID) {
       await firebaseSignOut(auth);
-      return { success: false, error: 'Access Denied: Your account is not authorized for CMS admin access.' };
+      return { success: false, error: 'Access Denied: Your account UID is not authorized for CMS admin access.' };
     }
     return { success: true };
   } catch (err: any) {
@@ -49,6 +66,10 @@ export const loginWithGoogle = async (): Promise<{ success: boolean; error?: str
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     const cred = await signInWithPopup(auth, provider);
+    if (!isEmailAuthorized(cred.user.email)) {
+      await firebaseSignOut(auth);
+      return { success: false, error: 'Access Denied: Only theihtpladmin@gmail.com is authorized for CMS admin access.' };
+    }
     if (AUTHORIZED_ADMIN_UID && cred.user.uid !== AUTHORIZED_ADMIN_UID) {
       await firebaseSignOut(auth);
       return { success: false, error: 'Access Denied: Your Google account is not authorized for CMS admin access.' };
@@ -82,8 +103,10 @@ export const subscribeAuth = (callback: (user: User | boolean | null) => void) =
   }
 
   return onAuthStateChanged(auth, (user) => {
-    if (user && AUTHORIZED_ADMIN_UID && user.uid !== AUTHORIZED_ADMIN_UID) {
-      callback(false); // Unauthorized user
+    if (user && !isEmailAuthorized(user.email)) {
+      callback(false); // Unauthorized email
+    } else if (user && AUTHORIZED_ADMIN_UID && user.uid !== AUTHORIZED_ADMIN_UID) {
+      callback(false); // Unauthorized UID
     } else {
       callback(user);
     }
