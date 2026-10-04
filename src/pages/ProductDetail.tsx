@@ -72,11 +72,6 @@ export const ProductDetail: React.FC = () => {
           <div className="lg:col-span-6 space-y-4">
             <div className="bg-gray-50 border border-industrial-border rounded-lg p-6 h-96 flex items-center justify-center relative">
               <img src={activeImage} alt={product.name} className="max-h-full max-w-full object-contain" />
-              {product.brandName && (
-                <span className="absolute top-4 left-4 bg-industrial-dark text-white text-xs font-bold px-3 py-1 rounded uppercase">
-                  {product.brandName}
-                </span>
-              )}
             </div>
 
             {/* Gallery Thumbnails */}

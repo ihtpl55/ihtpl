@@ -3,8 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Search, Filter, Package, ChevronRight, X, ArrowRight, Grid, List, ChevronLeft } from 'lucide-react';
 import { getProducts } from '../services/products.service';
 import { getCategories } from '../services/categories.service';
-import { getBrands } from '../services/brands.service';
-import { Product, Category, Brand } from '../types';
+import { Product, Category } from '../types';
 import { ProductCardSkeleton } from '../components/common/Skeleton';
 
 const ITEMS_PER_PAGE = 9;
@@ -13,22 +12,19 @@ export const Products: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [currentPage, setCurrentPage] = useState(1);
 
   const selectedCategory = searchParams.get('category') || '';
-  const selectedBrand = searchParams.get('brand') || '';
   const searchQuery = searchParams.get('q') || '';
   const sortBy = searchParams.get('sort') || 'featured';
 
   useEffect(() => {
-    Promise.all([getProducts(), getCategories(), getBrands()]).then(
-      ([prodList, catList, brandList]) => {
+    Promise.all([getProducts(), getCategories()]).then(
+      ([prodList, catList]) => {
         setProducts(prodList);
         setCategories(catList);
-        setBrands(brandList);
         setLoading(false);
       }
     );
@@ -37,7 +33,7 @@ export const Products: React.FC = () => {
   // Reset page to 1 when any filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedBrand, searchQuery, sortBy]);
+  }, [selectedCategory, searchQuery, sortBy]);
 
   const updateParam = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -59,16 +55,12 @@ export const Products: React.FC = () => {
       const catObj = categories.find(c => c.slug === selectedCategory || c.id === selectedCategory);
       if (catObj && p.categoryId !== catObj.id) return false;
     }
-    if (selectedBrand && p.brandId !== selectedBrand && p.brandName?.toLowerCase() !== selectedBrand.toLowerCase()) {
-      return false;
-    }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchName = p.name.toLowerCase().includes(q);
       const matchDesc = p.shortDescription.toLowerCase().includes(q);
       const matchCategory = p.categoryName.toLowerCase().includes(q);
-      const matchBrand = (p.brandName || '').toLowerCase().includes(q);
-      if (!matchName && !matchDesc && !matchCategory && !matchBrand) return false;
+      if (!matchName && !matchDesc && !matchCategory) return false;
     }
     return true;
   });
@@ -183,7 +175,7 @@ export const Products: React.FC = () => {
                 <div className="font-bold text-sm text-industrial-dark flex items-center">
                   <Filter className="w-4 h-4 mr-2 text-industrial-orange" /> Filter Catalog
                 </div>
-                {(selectedCategory || selectedBrand || searchQuery) && (
+                {(selectedCategory || searchQuery) && (
                   <button onClick={clearFilters} className="text-xs text-industrial-orange font-semibold hover:underline">
                     Reset All
                   </button>
@@ -218,33 +210,6 @@ export const Products: React.FC = () => {
                   })}
                 </div>
               </div>
-
-              {/* Brands Filter */}
-              {brands.length > 0 && (
-                <div className="pt-4 border-t border-industrial-border">
-                  <h3 className="text-xs font-bold uppercase text-industrial-muted tracking-wider mb-3">Brands</h3>
-                  <div className="space-y-1.5 text-xs">
-                    <button
-                      onClick={() => updateParam('brand', '')}
-                      className={`w-full text-left py-1.5 px-2 rounded font-medium transition-colors ${!selectedBrand ? 'bg-industrial-dark text-white font-bold' : 'text-industrial-dark hover:bg-industrial-light'}`}
-                    >
-                      All Brands
-                    </button>
-                    {brands.map((b) => {
-                      const isSel = selectedBrand === b.id || selectedBrand.toLowerCase() === b.name.toLowerCase();
-                      return (
-                        <button
-                          key={b.id}
-                          onClick={() => updateParam('brand', b.name)}
-                          className={`w-full text-left py-1.5 px-2 rounded font-medium transition-colors ${isSel ? 'bg-industrial-orange text-white font-bold' : 'text-industrial-dark hover:bg-industrial-light'}`}
-                        >
-                          {b.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
 
             </div>
           </aside>
@@ -292,11 +257,6 @@ export const Products: React.FC = () => {
                           e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product';
                         }}
                       />
-                      {prod.brandName && (
-                        <span className="absolute top-3 left-3 bg-industrial-dark text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                          {prod.brandName}
-                        </span>
-                      )}
                     </div>
 
                     <div className="p-4 flex-1 flex flex-col justify-between">
@@ -352,7 +312,7 @@ export const Products: React.FC = () => {
 
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-bold text-industrial-orange uppercase tracking-wider mb-1">
-                        {prod.categoryName} {prod.brandName ? `• ${prod.brandName}` : ''}
+                        {prod.categoryName}
                       </div>
                       <h3 className="text-base font-bold text-industrial-dark mb-1">
                         {prod.name}

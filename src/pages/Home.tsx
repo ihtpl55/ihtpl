@@ -397,11 +397,6 @@ export const Home: React.FC = () => {
                       e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product';
                     }}
                   />
-                  {prod.brandName && (
-                    <span className="absolute top-3 left-3 bg-industrial-dark text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                      {prod.brandName}
-                    </span>
-                  )}
                 </div>
 
                 <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">

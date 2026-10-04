@@ -149,8 +149,8 @@ export const AdminCRUD: React.FC = () => {
         slug: '',
         categoryId: categories[0]?.id || '',
         categoryName: categories[0]?.name || '',
-        brandId: brands[0]?.id || '',
-        brandName: brands[0]?.name || '',
+        brandId: '',
+        brandName: 'Infinite Hardware',
         shortDescription: '',
         description: '',
         featuredImage: '',
@@ -189,11 +189,11 @@ export const AdminCRUD: React.FC = () => {
 
     if (entity === 'products') {
       const selectedCat = categories.find(c => c.id === editingItem.categoryId);
-      const selectedBnd = brands.find(b => b.id === editingItem.brandId);
       const updatedItem = {
         ...editingItem,
         categoryName: selectedCat ? selectedCat.name : editingItem.categoryName,
-        brandName: selectedBnd ? selectedBnd.name : editingItem.brandName,
+        brandId: '',
+        brandName: 'Infinite Hardware',
       };
       await saveProduct(updatedItem);
     } else if (entity === 'categories') {
@@ -430,34 +430,19 @@ export const AdminCRUD: React.FC = () => {
 
           <form onSubmit={handleSave} className="space-y-4 text-xs">
             
-            {/* Category dropdowns */}
+            {/* Category dropdown */}
             {entity === 'products' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">Product Category</label>
-                  <select
-                    value={editingItem.categoryId}
-                    onChange={(e) => setEditingItem({ ...editingItem, categoryId: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
-                  >
-                    {categories.map(c => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">Manufacturer / Brand</label>
-                  <select
-                    value={editingItem.brandId}
-                    onChange={(e) => setEditingItem({ ...editingItem, brandId: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
-                  >
-                    <option value="">No Brand (Generic / Infinite Hardware)</option>
-                    {brands.map(b => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">Product Category *</label>
+                <select
+                  value={editingItem.categoryId}
+                  onChange={(e) => setEditingItem({ ...editingItem, categoryId: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                >
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </div>
             )}
 
