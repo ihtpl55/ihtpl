@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, FileText, Download, Search, Filter } from 'lucide-react';
-import { getDocuments } from '../services/documents.service';
+import { getDocuments, getDocumentCategories } from '../services/documents.service';
 import { getCertifications } from '../services/certifications.service';
 import { DocumentItem, Certification } from '../types';
 
 export const DocumentCenter: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
+  const [docCategories, setDocCategories] = useState<string[]>([]);
   const [selectedCat, setSelectedCat] = useState<string>('All');
   const [search, setSearch] = useState<string>('');
 
   useEffect(() => {
-    Promise.all([getDocuments(), getCertifications()]).then(([docs, certs]) => {
+    Promise.all([getDocuments(), getCertifications(), getDocumentCategories()]).then(([docs, certs, cats]) => {
       setDocuments(docs);
       setCertifications(certs);
+      setDocCategories(cats);
     });
   }, []);
 
-  const defaultCategories = ['Certifications', 'Catalogues', 'Technical Documents', 'Approvals', 'Company Documents'];
-  const categories = ['All', ...Array.from(new Set([...defaultCategories, ...documents.map(d => d.category).filter(Boolean)]))];
+  const categories = ['All', ...docCategories];
 
   const filteredDocs = documents.filter((doc) => {
     if (selectedCat !== 'All' && doc.category !== selectedCat) return false;

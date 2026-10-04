@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Plus, Trash2, Edit3, Upload, CheckCircle, Save, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Edit3, Upload, CheckCircle, Save, ChevronLeft, ChevronRight, FolderTree, X } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct } from '../services/products.service';
 import { getCategories, saveCategory, deleteCategory } from '../services/categories.service';
 import { getBrands, saveBrand, deleteBrand } from '../services/brands.service';
 import { getProjects, saveProject, deleteProject } from '../services/projects.service';
-import { getDocuments, saveDocument, deleteDocument } from '../services/documents.service';
+import { getDocuments, saveDocument, deleteDocument, getDocumentCategories, saveDocumentCategory, deleteDocumentCategory } from '../services/documents.service';
 import { getSiteSettings, updateSiteSettings } from '../services/settings.service';
 import { uploadFile } from '../services/storage.service';
 import { Product, Category, Brand, Project, SiteSettings } from '../types';
@@ -25,6 +25,10 @@ export const AdminCRUD: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCustomDocCat, setIsCustomDocCat] = useState(false);
   const [customDocCatInput, setCustomDocCatInput] = useState('');
+  const [docCategories, setDocCategories] = useState<string[]>([]);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [categoryActionLoading, setCategoryActionLoading] = useState(false);
   const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
@@ -57,21 +61,58 @@ export const AdminCRUD: React.FC = () => {
       } else if (entity === 'projects') {
         setItems(await getProjects(false));
       } else if (entity === 'documents') {
-        setItems(await getDocuments(false));
+        const docs = await getDocuments(false);
+        const cats = await getDocumentCategories();
+        setItems(docs);
+        setDocCategories(cats);
       }
     }
   };
 
-  const existingDocCategories = Array.from(
-    new Set([
-      'Certifications',
-      'Catalogues',
-      'Technical Documents',
-      'Approvals',
-      'Company Documents',
-      ...items.map((i: any) => i.category).filter(Boolean),
-    ])
-  );
+  const existingDocCategories = docCategories.length > 0
+    ? docCategories
+    : Array.from(
+        new Set([
+          'Certifications',
+          'Catalogues',
+          'Technical Documents',
+          'Approvals',
+          'Company Documents',
+          ...items.map((i: any) => i.category).filter(Boolean),
+        ])
+      );
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) return;
+    setCategoryActionLoading(true);
+    const updated = await saveDocumentCategory(newCategoryName.trim());
+    setDocCategories(updated);
+    setNewCategoryName('');
+    setCategoryActionLoading(false);
+  };
+
+  const handleDeleteCategory = async (catToDelete: string, docCount: number) => {
+    const remainingCats = docCategories.filter((c) => c !== catToDelete);
+    const fallbackCat = remainingCats[0] || 'Catalogues';
+
+    const confirmMsg =
+      docCount > 0
+        ? `Are you sure you want to delete category "${catToDelete}"? ${docCount} document(s) in this category will be reassigned to "${fallbackCat}".`
+        : `Are you sure you want to delete category "${catToDelete}"?`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    setCategoryActionLoading(true);
+    const updated = await deleteDocumentCategory(catToDelete);
+    setDocCategories(updated);
+    const freshDocs = await getDocuments(false);
+    setItems(freshDocs);
+    if (editingItem && editingItem.category === catToDelete) {
+      setEditingItem({ ...editingItem, category: updated[0] });
+    }
+    setCategoryActionLoading(false);
+  };
 
   const handleSlugGen = (name: string) => {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -196,13 +237,26 @@ export const AdminCRUD: React.FC = () => {
         </div>
 
         {entity !== 'settings' && !editingItem && (
-          <button
-            onClick={handleCreateNew}
-            className="px-4 py-2.5 bg-industrial-orange hover:bg-industrial-orange-hover text-white text-xs font-bold rounded flex items-center space-x-1.5 self-start sm:self-auto transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add New Item</span>
-          </button>
+          <div className="flex items-center space-x-2 self-start sm:self-auto">
+            {entity === 'documents' && (
+              <button
+                type="button"
+                onClick={() => setShowCategoryManager(true)}
+                className="px-3.5 py-2.5 bg-industrial-slate hover:bg-industrial-dark text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shadow-sm"
+                title="Create or delete document categories"
+              >
+                <FolderTree className="w-4 h-4 text-industrial-orange" />
+                <span>Manage Categories</span>
+              </button>
+            )}
+            <button
+              onClick={handleCreateNew}
+              className="px-4 py-2.5 bg-industrial-orange hover:bg-industrial-orange-hover text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Item</span>
+            </button>
+          </div>
         )}
       </div>
 
@@ -366,22 +420,34 @@ export const AdminCRUD: React.FC = () => {
                     <label className="block font-bold text-industrial-dark uppercase tracking-wider">
                       Document Category *
                     </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = !isCustomDocCat;
-                        setIsCustomDocCat(next);
-                        if (next) {
-                          setCustomDocCatInput('');
-                          setEditingItem({ ...editingItem, category: '' });
-                        } else {
-                          setEditingItem({ ...editingItem, category: existingDocCategories[0] || 'Catalogues' });
-                        }
-                      }}
-                      className="text-[11px] text-industrial-orange hover:underline font-bold"
-                    >
-                      {isCustomDocCat ? '← Pick from list' : '+ Type New Category'}
-                    </button>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowCategoryManager(true)}
+                        className="text-[11px] text-gray-500 hover:text-industrial-dark hover:underline font-semibold flex items-center"
+                        title="Add or delete categories"
+                      >
+                        <FolderTree className="w-3 h-3 mr-0.5 text-industrial-orange" />
+                        Manage List
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !isCustomDocCat;
+                          setIsCustomDocCat(next);
+                          if (next) {
+                            setCustomDocCatInput('');
+                            setEditingItem({ ...editingItem, category: '' });
+                          } else {
+                            setEditingItem({ ...editingItem, category: existingDocCategories[0] || 'Catalogues' });
+                          }
+                        }}
+                        className="text-[11px] text-industrial-orange hover:underline font-bold"
+                      >
+                        {isCustomDocCat ? '← Pick from list' : '+ Type New'}
+                      </button>
+                    </div>
                   </div>
 
                   {isCustomDocCat ? (
@@ -703,6 +769,104 @@ export const AdminCRUD: React.FC = () => {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Category Manager Modal */}
+      {showCategoryManager && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-elevated border border-industrial-border max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-industrial-border pb-3">
+              <div className="flex items-center space-x-2">
+                <FolderTree className="w-5 h-5 text-industrial-orange" />
+                <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark">
+                  Manage Document Categories
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCategoryManager(false)}
+                className="p-1 text-gray-400 hover:text-industrial-dark transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Add New Category form */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-industrial-dark mb-1">
+                Add New Category
+              </label>
+              <form onSubmit={handleCreateCategory} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g. Safety Standards, Test Reports..."
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-white border border-industrial-border rounded text-xs focus:outline-none focus:border-industrial-orange"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={categoryActionLoading || !newCategoryName.trim()}
+                  className="px-4 py-2 bg-industrial-orange hover:bg-industrial-orange-hover disabled:opacity-50 text-white text-xs font-bold rounded flex items-center transition-colors uppercase tracking-wider shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  <span>Add</span>
+                </button>
+              </form>
+            </div>
+
+            {/* List of existing categories with delete action */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-industrial-dark mb-2">
+                Existing Categories ({docCategories.length})
+              </label>
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1 divide-y divide-gray-100">
+                {docCategories.map((cat) => {
+                  const docCount = items.filter((d) => d.category === cat).length;
+                  return (
+                    <div
+                      key={cat}
+                      className="flex items-center justify-between py-2 px-3 bg-industrial-light/60 hover:bg-industrial-light rounded border border-industrial-border transition-colors text-xs"
+                    >
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <span className="font-bold text-industrial-dark truncate">{cat}</span>
+                        <span className="text-[10px] text-gray-500 font-medium px-2 py-0.5 rounded-full bg-white border border-gray-200 shrink-0">
+                          {docCount} {docCount === 1 ? 'doc' : 'docs'}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={categoryActionLoading || docCategories.length <= 1}
+                        onClick={() => handleDeleteCategory(cat, docCount)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+                        title={
+                          docCategories.length <= 1
+                            ? 'Cannot delete the only remaining category'
+                            : `Delete "${cat}"`
+                        }
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-3 border-t border-industrial-border">
+              <button
+                type="button"
+                onClick={() => setShowCategoryManager(false)}
+                className="px-5 py-2 bg-industrial-dark hover:bg-industrial-slate text-white text-xs font-bold rounded uppercase tracking-wider transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
