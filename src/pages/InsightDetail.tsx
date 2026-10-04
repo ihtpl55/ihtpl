@@ -62,8 +62,8 @@ export const InsightDetail: React.FC = () => {
 
         <div className="p-6 bg-industrial-slate text-white rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-bold">Have a Technical Fastener Question?</h3>
-            <p className="text-xs text-gray-300">Consult our sales engineering team for load calculations and certified MTC supplies.</p>
+            <h3 className="text-lg font-bold">Have an Engineering or Technical Question?</h3>
+            <p className="text-xs text-gray-300">Consult our structural engineering team for load calculations, CAD drawings, and certified MTC supplies.</p>
           </div>
           <Link to="/contact" className="px-5 py-2.5 bg-industrial-orange text-white text-xs font-bold rounded hover:bg-industrial-orange-hover shrink-0">
             Contact Engineering Team

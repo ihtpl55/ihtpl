@@ -14,30 +14,30 @@ export const Infrastructure: React.FC = () => {
 
         <div className="border-b border-industrial-border pb-8 mb-12">
           <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight mb-3">
-            Distribution Infrastructure & Warehousing
+            Manufacturing Infrastructure & Facilities
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Our 45,000 sq.ft barcode-controlled central distribution hub handles palletized storage, digital batch tracking, and express freight dispatches directly to project jobsites across India.
+            Our state-of-the-art manufacturing plants and warehousing facilities handle precision fabrication, elastomer vulcanization, mechanical proof load testing, and express freight dispatches directly to project jobsites across India.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-industrial-light p-6 rounded-lg border border-industrial-border">
             <Building2 className="w-8 h-8 text-industrial-orange mb-4" />
-            <h2 className="text-lg font-bold text-industrial-dark mb-2">Central Barcode Warehouse</h2>
-            <p className="text-xs text-industrial-muted">High-bay pallet racking storing over 5,000 active hardware SKUs for immediate site dispatch.</p>
+            <h2 className="text-lg font-bold text-industrial-dark mb-2">Heavy Fabrication & Machining</h2>
+            <p className="text-xs text-industrial-muted">Equipped with heavy CNC machining centers, automated cutting, and precision welding equipment for structural components.</p>
           </div>
 
           <div className="bg-industrial-light p-6 rounded-lg border border-industrial-border">
             <ShieldCheck className="w-8 h-8 text-industrial-orange mb-4" />
-            <h2 className="text-lg font-bold text-industrial-dark mb-2">Metrology & Testing Lab</h2>
-            <p className="text-xs text-industrial-muted">On-site digital vernier calipers, thread pitch gauges, coating thickness meters, and hydraulic load cells.</p>
+            <h2 className="text-lg font-bold text-industrial-dark mb-2">Proof Load & Testing Lab</h2>
+            <p className="text-xs text-industrial-muted">Equipped with calibrated hydraulic compression test rigs, shear load testing machines, elastomer rheometers, and metrology instruments.</p>
           </div>
 
           <div className="bg-industrial-light p-6 rounded-lg border border-industrial-border">
             <Truck className="w-8 h-8 text-industrial-orange mb-4" />
-            <h2 className="text-lg font-bold text-industrial-dark mb-2">Freight & Express Logistics</h2>
-            <p className="text-xs text-industrial-muted">Weatherproof crate packaging and dedicated freight fleet dispatch for time-sensitive site orders.</p>
+            <h2 className="text-lg font-bold text-industrial-dark mb-2">Freight & Jobsite Logistics</h2>
+            <p className="text-xs text-industrial-muted">Industrial weatherproof crating, barcode batch tracking, and nationwide freight dispatch directly to major infrastructure project sites.</p>
           </div>
         </div>
       </div>

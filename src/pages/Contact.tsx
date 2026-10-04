@@ -89,7 +89,7 @@ export const Contact: React.FC = () => {
 
         <div className="border-b border-industrial-border pb-8 mb-12">
           <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight mb-3">
-            Contact Apex Industrial Hardware
+            Contact {settings.companyName || 'Infinite Hardware Technology'}
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
             Have a bill-of-materials requirement, technical product query, or request for mill test certificates? Reach out to our technical sales team directly.
@@ -245,7 +245,7 @@ export const Contact: React.FC = () => {
                       required
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      placeholder="e.g. Apex Infrastructure Pvt Ltd"
+                      placeholder="e.g. L&T Infrastructure / Dilip Buildcon Ltd"
                       className="w-full px-3 py-2 bg-white border border-industrial-border rounded text-xs text-industrial-dark focus:outline-none focus:border-industrial-orange"
                     />
                   </div>

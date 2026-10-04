@@ -63,7 +63,7 @@ export const AdminLogin: React.FC = () => {
             <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded text-xs leading-relaxed">
               <span className="font-bold">Demo Mode Active:</span>
               <div className="mt-1">You can click "Sign in with Google" or use demo credentials:</div>
-              <div className="mt-1 font-mono text-[11px]">Email: admin@apexindustrial.in</div>
+              <div className="mt-1 font-mono text-[11px]">Email: theihtpladmin@gmail.com</div>
               <div className="font-mono text-[11px]">Password: admin123</div>
             </div>
           )}

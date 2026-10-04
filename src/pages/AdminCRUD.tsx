@@ -6,9 +6,14 @@ import { getCategories, saveCategory, deleteCategory } from '../services/categor
 import { getBrands, saveBrand, deleteBrand } from '../services/brands.service';
 import { getProjects, saveProject, deleteProject } from '../services/projects.service';
 import { getDocuments, saveDocument, deleteDocument, getDocumentCategories, saveDocumentCategory, deleteDocumentCategory } from '../services/documents.service';
+import { getIndustries, saveIndustry, deleteIndustry } from '../services/industries.service';
+import { getCapabilities, saveCapability, deleteCapability } from '../services/capabilities.service';
+import { getGalleryItems, saveGalleryItem, deleteGalleryItem } from '../services/gallery.service';
+import { getCertifications, saveCertification, deleteCertification } from '../services/certifications.service';
+import { getPosts, savePost, deletePost } from '../services/posts.service';
 import { getSiteSettings, updateSiteSettings } from '../services/settings.service';
 import { uploadFile } from '../services/storage.service';
-import { Product, Category, Brand, Project, SiteSettings } from '../types';
+import { Product, Category, Brand, Project, SiteSettings, Industry, Capability, GalleryItem, Certification, BlogPost } from '../types';
 
 export const AdminCRUD: React.FC = () => {
   const { entity } = useParams<{ entity: string }>();
@@ -65,6 +70,16 @@ export const AdminCRUD: React.FC = () => {
         const cats = await getDocumentCategories();
         setItems(docs);
         setDocCategories(cats);
+      } else if (entity === 'industries') {
+        setItems(await getIndustries(false));
+      } else if (entity === 'capabilities') {
+        setItems(await getCapabilities(false));
+      } else if (entity === 'gallery') {
+        setItems(await getGalleryItems(false));
+      } else if (entity === 'certifications') {
+        setItems(await getCertifications(false));
+      } else if (entity === 'posts') {
+        setItems(await getPosts(false));
       }
     }
   };
@@ -150,11 +165,21 @@ export const AdminCRUD: React.FC = () => {
     } else if (entity === 'brands') {
       setEditingItem({ name: '', logo: '', description: '', published: true, sortOrder: 1 });
     } else if (entity === 'projects') {
-      setEditingItem({ title: '', slug: '', industry: 'Bridges & Roads', location: '', year: new Date().getFullYear().toString(), shortResult: '', challenge: '', solution: '', outcome: '', heroImage: '', published: true });
+      setEditingItem({ title: '', slug: '', industry: 'Bridges & Roads', location: '', year: new Date().getFullYear().toString(), shortResult: '', challenge: '', solution: '', outcome: '', heroImage: '', published: true, sortOrder: 1 });
     } else if (entity === 'documents') {
       setIsCustomDocCat(false);
       setCustomDocCatInput('');
-      setEditingItem({ title: '', category: 'Catalogues', fileUrl: '', fileType: 'PDF', size: '1.0 MB', published: true });
+      setEditingItem({ title: '', category: 'Catalogues', fileUrl: '', fileType: 'PDF', size: '1.0 MB', published: true, sortOrder: 1 });
+    } else if (entity === 'industries') {
+      setEditingItem({ title: '', slug: '', shortDescription: '', image: '', published: true, sortOrder: 1 });
+    } else if (entity === 'capabilities') {
+      setEditingItem({ title: '', slug: '', shortDescription: '', fullContent: '', image: '', published: true, sortOrder: 1 });
+    } else if (entity === 'gallery') {
+      setEditingItem({ title: '', category: 'Products', image: '', caption: '', published: true, sortOrder: 1 });
+    } else if (entity === 'certifications') {
+      setEditingItem({ title: '', issuingAuthority: 'ISO', certificateNumber: '', validUntil: '', thumbnail: '', pdfUrl: '', published: true, sortOrder: 1 });
+    } else if (entity === 'posts') {
+      setEditingItem({ title: '', slug: '', summary: '', content: '', heroImage: '', category: 'Technical', author: 'Technical Editorial', publishDate: new Date().toISOString().split('T')[0], published: true });
     }
   };
 
@@ -179,6 +204,16 @@ export const AdminCRUD: React.FC = () => {
       await saveProject(editingItem);
     } else if (entity === 'documents') {
       await saveDocument(editingItem);
+    } else if (entity === 'industries') {
+      await saveIndustry(editingItem);
+    } else if (entity === 'capabilities') {
+      await saveCapability(editingItem);
+    } else if (entity === 'gallery') {
+      await saveGalleryItem(editingItem);
+    } else if (entity === 'certifications') {
+      await saveCertification(editingItem);
+    } else if (entity === 'posts') {
+      await savePost(editingItem);
     }
 
     setEditingItem(null);
@@ -200,6 +235,11 @@ export const AdminCRUD: React.FC = () => {
     else if (entity === 'brands') await deleteBrand(id);
     else if (entity === 'projects') await deleteProject(id);
     else if (entity === 'documents') await deleteDocument(id);
+    else if (entity === 'industries') await deleteIndustry(id);
+    else if (entity === 'capabilities') await deleteCapability(id);
+    else if (entity === 'gallery') await deleteGalleryItem(id);
+    else if (entity === 'certifications') await deleteCertification(id);
+    else if (entity === 'posts') await deletePost(id);
     loadEntityData();
   };
 
@@ -507,10 +547,180 @@ export const AdminCRUD: React.FC = () => {
               </div>
             )}
 
+            {/* Gallery Category & Caption */}
+            {entity === 'gallery' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Gallery Category *
+                  </label>
+                  <select
+                    value={editingItem.category || 'Products'}
+                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  >
+                    <option value="Products">Products</option>
+                    <option value="Projects">Projects</option>
+                    <option value="Facilities">Facilities</option>
+                    <option value="Warehouse">Warehouse</option>
+                    <option value="Deliveries">Deliveries</option>
+                    <option value="Events">Events</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Photo Caption / Tagline (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Precision CNC machining for spherical bearings"
+                    value={editingItem.caption || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, caption: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Certifications fields */}
+            {entity === 'certifications' && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Issuing Authority *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. ISO / TUV / RDSO"
+                    value={editingItem.issuingAuthority || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, issuingAuthority: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Certificate Number
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. ISO 9001:2015"
+                    value={editingItem.certificateNumber || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, certificateNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Valid Until / Expiry
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2028-12-31"
+                    value={editingItem.validUntil || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, validUntil: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Blog Post Meta */}
+            {entity === 'posts' && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Article Category
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Technical, Engineering, Standards"
+                    value={editingItem.category || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Author
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Technical Editorial"
+                    value={editingItem.author || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, author: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Publish Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editingItem.publishDate || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, publishDate: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Project Meta */}
+            {entity === 'projects' && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Industry / Sector *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Bridges & Highways, Metro Rail"
+                    value={editingItem.industry || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, industry: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Project Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Mumbai, Maharashtra"
+                    value={editingItem.location || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, location: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Completion Year
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 2024"
+                    value={editingItem.year || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, year: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Title / Name */}
             <div>
               <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                {entity === 'products' ? 'Product Name *' : entity === 'projects' ? 'Project Title *' : 'Name / Title *'}
+                {entity === 'products'
+                  ? 'Product Name *'
+                  : entity === 'projects'
+                  ? 'Project Title *'
+                  : entity === 'posts'
+                  ? 'Article Title *'
+                  : entity === 'certifications'
+                  ? 'Certificate Name *'
+                  : 'Name / Title *'}
               </label>
               <input
                 type="text"
@@ -523,7 +733,7 @@ export const AdminCRUD: React.FC = () => {
                     ...editingItem,
                     name: val,
                     title: val,
-                    ...(entity !== 'documents' ? { slug } : {})
+                    ...(entity !== 'documents' && entity !== 'gallery' && entity !== 'certifications' ? { slug } : {})
                   });
                 }}
                 className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
@@ -531,7 +741,7 @@ export const AdminCRUD: React.FC = () => {
             </div>
 
             {/* Web Link */}
-            {editingItem.slug !== undefined && entity !== 'documents' && (
+            {editingItem.slug !== undefined && entity !== 'documents' && entity !== 'gallery' && entity !== 'certifications' && (
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
                   Web Link URL Address <span className="text-[10px] text-gray-500 font-normal lowercase">(Automatically generated from title)</span>
@@ -548,18 +758,24 @@ export const AdminCRUD: React.FC = () => {
             {/* Upload file */}
             <div>
               <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                {entity === 'documents' ? 'Upload PDF Document *' : 'Image URL'}
+                {entity === 'documents'
+                  ? 'Upload PDF Document *'
+                  : entity === 'certifications'
+                  ? 'Certificate Thumbnail Image'
+                  : 'Image URL'}
               </label>
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={editingItem.featuredImage || editingItem.image || editingItem.heroImage || editingItem.fileUrl || ''}
+                  value={editingItem.featuredImage || editingItem.image || editingItem.heroImage || editingItem.fileUrl || editingItem.thumbnail || editingItem.logo || ''}
                   onChange={(e) => setEditingItem({
                     ...editingItem,
                     featuredImage: e.target.value,
                     image: e.target.value,
                     heroImage: e.target.value,
-                    fileUrl: e.target.value
+                    fileUrl: e.target.value,
+                    thumbnail: e.target.value,
+                    logo: e.target.value,
                   })}
                   className="flex-1 px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
                 />
@@ -571,7 +787,17 @@ export const AdminCRUD: React.FC = () => {
                     className="hidden"
                     onChange={(e) => handleFileUpload(
                       e,
-                      entity === 'documents' ? 'fileUrl' : entity === 'projects' ? 'heroImage' : entity === 'categories' ? 'image' : 'featuredImage',
+                      entity === 'documents'
+                        ? 'fileUrl'
+                        : entity === 'projects' || entity === 'posts'
+                        ? 'heroImage'
+                        : entity === 'certifications'
+                        ? 'thumbnail'
+                        : entity === 'brands'
+                        ? 'logo'
+                        : entity === 'products'
+                        ? 'featuredImage'
+                        : 'image',
                       entity as any
                     )}
                   />
@@ -580,36 +806,121 @@ export const AdminCRUD: React.FC = () => {
               {uploading && <div className="text-[10px] text-industrial-orange mt-1">Uploading... {uploadProgress.toFixed(0)}%</div>}
             </div>
 
-            {/* Short description */}
-            {editingItem.shortDescription !== undefined && (
+            {/* Extra file upload for Certifications (PDF link) */}
+            {entity === 'certifications' && (
+              <div>
+                <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                  Certificate Document (PDF)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="URL to certificate PDF"
+                    value={editingItem.pdfUrl || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, pdfUrl: e.target.value })}
+                    className="flex-1 px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  />
+                  <label className="px-4 py-2 bg-industrial-dark text-white rounded font-bold cursor-pointer hover:bg-industrial-slate flex items-center transition-colors">
+                    <Upload className="w-3.5 h-3.5 mr-1" />
+                    <span>Upload PDF</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload(e, 'pdfUrl', 'certifications')}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Project Case Study Detailed Fields */}
+            {entity === 'projects' && (
+              <div className="space-y-4 pt-2 border-t border-gray-100">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Key Result / Metric Summary
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Supplied 120 pot bearings and 4 modular expansion joints with zero field defects."
+                    value={editingItem.shortResult || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, shortResult: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Project Challenge
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Describe engineering or logistical challenges faced..."
+                    value={editingItem.challenge || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, challenge: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Technical Solution & Supplied Hardware
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Describe the solution engineered and supplied..."
+                    value={editingItem.solution || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, solution: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  ></textarea>
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Outcome & Client Feedback
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Describe testing results, on-time installation, and client satisfaction..."
+                    value={editingItem.outcome || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, outcome: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  ></textarea>
+                </div>
+              </div>
+            )}
+
+            {/* Short description / summary */}
+            {(editingItem.shortDescription !== undefined || editingItem.summary !== undefined) && entity !== 'projects' && (
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
                   Brief Summary <span className="text-[10px] text-gray-500 font-normal lowercase">(1-2 sentences for list view)</span>
                 </label>
                 <textarea
                   rows={2}
-                  value={editingItem.shortDescription}
-                  onChange={(e) => setEditingItem({ ...editingItem, shortDescription: e.target.value })}
+                  value={editingItem.shortDescription !== undefined ? editingItem.shortDescription : editingItem.summary}
+                  onChange={(e) => setEditingItem(
+                    editingItem.shortDescription !== undefined
+                      ? { ...editingItem, shortDescription: e.target.value }
+                      : { ...editingItem, summary: e.target.value }
+                  )}
                   className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
                 ></textarea>
               </div>
             )}
 
-            {/* Long description */}
-            {(editingItem.description !== undefined || editingItem.fullContent !== undefined) && (
+            {/* Long description / full content */}
+            {(editingItem.description !== undefined || editingItem.fullContent !== undefined || editingItem.content !== undefined) && entity !== 'projects' && (
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                  Detailed Description / Main Text
+                  Detailed Description / Article Body
                 </label>
                 <textarea
-                  rows={6}
-                  value={editingItem.description !== undefined ? editingItem.description : editingItem.fullContent}
+                  rows={8}
+                  value={editingItem.description !== undefined ? editingItem.description : (editingItem.fullContent !== undefined ? editingItem.fullContent : editingItem.content)}
                   onChange={(e) => setEditingItem(
                     editingItem.description !== undefined
                       ? { ...editingItem, description: e.target.value }
-                      : { ...editingItem, fullContent: e.target.value }
+                      : (editingItem.fullContent !== undefined ? { ...editingItem, fullContent: e.target.value } : { ...editingItem, content: e.target.value })
                   )}
-                  className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
+                  className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none font-mono text-xs"
                 ></textarea>
               </div>
             )}
@@ -676,8 +987,9 @@ export const AdminCRUD: React.FC = () => {
               <thead className="bg-industrial-light text-industrial-dark uppercase font-bold text-[10px] tracking-wider border-b border-industrial-border">
                 <tr>
                   <th className="p-3">Title / Name</th>
-                  {entity === 'documents' && <th className="p-3">Category</th>}
-                  {entity !== 'documents' && <th className="p-3">Web Link URL</th>}
+                  {(entity === 'documents' || entity === 'gallery') && <th className="p-3">Category</th>}
+                  {entity === 'certifications' && <th className="p-3">Issuing Authority</th>}
+                  {entity !== 'documents' && entity !== 'gallery' && entity !== 'certifications' && <th className="p-3">Web Link URL</th>}
                   <th className="p-3">Status</th>
                   <th className="p-3 text-right">Actions</th>
                 </tr>
@@ -688,14 +1000,19 @@ export const AdminCRUD: React.FC = () => {
                   .map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/50">
                       <td className="p-3 font-semibold text-industrial-dark">{item.name || item.title}</td>
-                      {entity === 'documents' && (
+                      {(entity === 'documents' || entity === 'gallery') && (
                         <td className="p-3">
                           <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-industrial-light text-industrial-dark border border-industrial-border">
-                            {item.category || 'Catalogues'}
+                            {item.category || 'General'}
                           </span>
                         </td>
                       )}
-                      {entity !== 'documents' && (
+                      {entity === 'certifications' && (
+                        <td className="p-3 text-industrial-dark font-medium">
+                          {item.issuingAuthority} {item.certificateNumber ? `(${item.certificateNumber})` : ''}
+                        </td>
+                      )}
+                      {entity !== 'documents' && entity !== 'gallery' && entity !== 'certifications' && (
                         <td className="p-3 font-mono text-gray-500 text-[10px]">/{item.slug || item.id}</td>
                       )}
                       <td className="p-3">

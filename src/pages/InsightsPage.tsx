@@ -22,10 +22,10 @@ export const InsightsPage: React.FC = () => {
 
         <div className="border-b border-industrial-border pb-8 mb-12">
           <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight mb-3">
-            Technical Insights & Fastener Engineering Articles
+            Technical Insights & Engineering Articles
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Technical guides covering ISO bolt property classes, chemical anchor resin selection, hydrogen embrittlement prevention, and torque wrench calibration standards.
+            Technical guides covering structural bridge bearing design, expansion joint movement tolerances, elastomer vulcanization, and international engineering standards.
           </p>
         </div>
 

@@ -17,7 +17,7 @@ export const Quality: React.FC = () => {
             Quality Control & Compliance Standards
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Apex Industrial Hardware operates under an ISO 9001:2015 certified quality management system. Every order includes material mill test certificates (MTC) conforming to EN 10204 3.1 standards.
+            Infinite Hardware Technology (P) Ltd. operates under an ISO 9001:2015 certified quality management system. Every order includes material mill test certificates (MTC) conforming to EN 10204 3.1 standards.
           </p>
         </div>
 
@@ -26,7 +26,7 @@ export const Quality: React.FC = () => {
             <ShieldCheck className="w-10 h-10 text-industrial-orange" />
             <h2 className="text-xl font-bold">Traceability & Batch Testing</h2>
             <p className="text-xs text-gray-300 leading-relaxed">
-              Fastener batches undergo chemical spectro-analysis, tensile proof load testing, and zinc coating thickness verification to prevent premature fatigue failure in critical infrastructure.
+              Material batches undergo chemical spectro-analysis, proof load testing, elastomer rheology tests, and corrosion resistance verification to prevent premature fatigue failure in critical infrastructure.
             </p>
           </div>
 

@@ -2,7 +2,7 @@ import { collection, getDocs, doc, setDoc, deleteDoc, query, orderBy, serverTime
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { Enquiry, EnquiryStatus } from '../types';
 
-const STORAGE_KEY = 'apex_enquiries';
+const STORAGE_KEY = 'ihtpl_enquiries';
 
 const getLocalEnquiries = (): Enquiry[] => {
   const saved = localStorage.getItem(STORAGE_KEY);

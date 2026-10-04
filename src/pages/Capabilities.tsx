@@ -22,10 +22,10 @@ export const Capabilities: React.FC = () => {
 
         <div className="border-b border-industrial-border pb-8 mb-12">
           <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight mb-3">
-            B2B Procurement & Supply Capabilities
+            Engineering & Manufacturing Capabilities
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            From bill-of-materials fulfillment and custom forging to qualified on-site pull-out anchor testing, explore how Apex Industrial supports major project execution.
+            From precision bridge bearing fabrication and expansion joint engineering to custom structural hardware and on-site testing, explore our turnkey industrial solutions.
           </p>
         </div>
 
@@ -35,7 +35,7 @@ export const Capabilities: React.FC = () => {
               <div className="lg:col-span-8 space-y-4">
                 <div className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-industrial-orange bg-white px-3 py-1 rounded border border-industrial-border">
                   <Wrench className="w-3.5 h-3.5" />
-                  <span>Apex Service Capability</span>
+                  <span>Engineering Capability</span>
                 </div>
                 <h2 className="text-2xl font-bold text-industrial-dark">{cap.title}</h2>
                 <p className="text-sm text-industrial-muted leading-relaxed">{cap.fullContent || cap.shortDescription}</p>

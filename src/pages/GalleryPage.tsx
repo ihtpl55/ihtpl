@@ -27,10 +27,10 @@ export const GalleryPage: React.FC = () => {
 
         <div className="border-b border-industrial-border pb-8 mb-8">
           <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight mb-3">
-            Warehouse, Products & Field Operations Gallery
+            Manufacturing, Products & Field Operations Gallery
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Visual inspection of our central distribution warehouse, inventory stocking, site pull-out testing, and freight dispatches.
+            Visual inspection of our manufacturing plants, precision bridge bearings, expansion joints, proof load testing, and site installations across India.
           </p>
         </div>
 

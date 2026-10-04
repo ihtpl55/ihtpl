@@ -8,7 +8,7 @@ import {
 } from 'firebase/auth';
 import { auth, AUTHORIZED_ADMIN_UID, USE_DEMO_DATA } from '../lib/firebase';
 
-const DEMO_ADMIN_KEY = 'apex_demo_admin_auth';
+const DEMO_ADMIN_KEY = 'ihtpl_demo_admin_auth';
 
 const ALLOWED_ADMIN_EMAILS = [
   'theihtpladmin@gmail.com',
@@ -29,7 +29,7 @@ export const isDemoAuthenticated = (): boolean => {
 
 export const loginAdmin = async (email: string, pass: string): Promise<{ success: boolean; error?: string }> => {
   if (USE_DEMO_DATA) {
-    if (email === 'admin@apexindustrial.in' && pass === 'admin123') {
+    if ((email.toLowerCase() === 'theihtpladmin@gmail.com' || email.toLowerCase() === 'admin@ihtpl.com') && pass === 'admin123') {
       localStorage.setItem(DEMO_ADMIN_KEY, 'true');
       return { success: true };
     }

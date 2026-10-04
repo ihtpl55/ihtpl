@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, ShieldCheck, Lock } from 'lucide-react';
-import { SiteSettings } from '../../types';
+import { SiteSettings, Category } from '../../types';
+import { getCategories } from '../../services/categories.service';
 
 interface FooterProps {
   settings: SiteSettings;
 }
 
 export const Footer: React.FC<FooterProps> = ({ settings }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategories().then((cats) => setCategories(cats)).catch(() => {});
+  }, []);
   return (
     <footer className="bg-industrial-dark text-white border-t border-industrial-slate">
       {/* Top Banner */}
@@ -82,11 +88,24 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
         <div>
           <h4 className="text-xs font-bold uppercase tracking-wider text-industrial-orange mb-4">Products</h4>
           <ul className="space-y-2.5 text-xs text-gray-400">
-            <li><Link to="/products?category=bridge-bearings" className="hover:text-white transition-colors">Bridge Bearings</Link></li>
-            <li><Link to="/products?category=expansion-joints" className="hover:text-white transition-colors">Expansion Joints</Link></li>
-            <li><Link to="/products?category=industrial-couplings" className="hover:text-white transition-colors">Industrial Couplings</Link></li>
-            <li><Link to="/products?category=fasteners-bolting" className="hover:text-white transition-colors">Fasteners & Bolting</Link></li>
-            <li><Link to="/products?category=anchors-fixing" className="hover:text-white transition-colors">Anchors & Fixing</Link></li>
+            {categories.length > 0 ? (
+              categories.slice(0, 5).map((cat) => (
+                <li key={cat.id}>
+                  <Link
+                    to={`/products?category=${cat.slug || cat.id}`}
+                    className="hover:text-white transition-colors"
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <>
+                <li><Link to="/products?category=bridge-bearings" className="hover:text-white transition-colors">Bridge Bearings</Link></li>
+                <li><Link to="/products?category=expansion-joints" className="hover:text-white transition-colors">Expansion Joints</Link></li>
+                <li><Link to="/products?category=industrial-couplings" className="hover:text-white transition-colors">Industrial Couplings</Link></li>
+              </>
+            )}
             <li><Link to="/products" className="text-industrial-orange hover:underline font-semibold mt-1 inline-block">Full Product Catalog →</Link></li>
           </ul>
         </div>

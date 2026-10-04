@@ -29,7 +29,7 @@ export const Projects: React.FC = () => {
             Completed Projects & Field Proof
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Discover how Apex Industrial Hardware fulfilled bill-of-materials and technical fastener requirements across transit rail, power plants, solar developments, and automotive assembly lines.
+            Discover how Infinite Hardware Technology fulfilled bill-of-materials, precision manufacturing, and heavy engineering hardware requirements across bridges, highways, transit rail, and industrial infrastructure.
           </p>
         </div>
 

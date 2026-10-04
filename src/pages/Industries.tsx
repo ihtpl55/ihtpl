@@ -25,7 +25,7 @@ export const Industries: React.FC = () => {
             Industries & Sectors We Supply
           </h1>
           <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Apex Industrial Hardware provides tailored supply chain solutions, batch test certification, and bulk procurement support for critical infrastructure, manufacturing, and transit projects.
+            Infinite Hardware Technology provides engineered bridge components, structural hardware, batch test certification, and heavy manufacturing solutions for critical infrastructure, highways, and transit sectors.
           </p>
         </div>
 
