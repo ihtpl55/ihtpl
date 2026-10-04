@@ -147,7 +147,13 @@ export const AdminCRUD: React.FC = () => {
       if (entity === 'settings') {
         setSettingsItem((prev: any) => ({ ...prev, [field]: url }));
       } else {
-        setEditingItem((prev: any) => ({ ...prev, [field]: url }));
+        const extraDocFields = entity === 'documents' ? {
+          size: file.size > 1048576 
+            ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
+            : `${(file.size / 1024).toFixed(0)} KB`,
+          fileType: file.name.split('.').pop()?.toUpperCase() || 'PDF'
+        } : {};
+        setEditingItem((prev: any) => ({ ...prev, [field]: url, ...extraDocFields }));
       }
       setUploading(false);
     } catch (err: any) {
@@ -336,6 +342,38 @@ export const AdminCRUD: React.FC = () => {
               </div>
             )}
 
+            {entity === 'documents' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Document Category *
+                  </label>
+                  <select
+                    value={editingItem.category || 'Catalogues'}
+                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  >
+                    <option value="Certifications">Certifications</option>
+                    <option value="Catalogues">Catalogues</option>
+                    <option value="Technical Documents">Technical Documents</option>
+                    <option value="Approvals">Approvals</option>
+                    <option value="Company Documents">Company Documents</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Issue / Document Date (Optional)
+                  </label>
+                  <input
+                    type="date"
+                    value={editingItem.issueDate || ''}
+                    onChange={(e) => setEditingItem({ ...editingItem, issueDate: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Title / Name */}
             <div>
               <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
@@ -348,14 +386,19 @@ export const AdminCRUD: React.FC = () => {
                 onChange={(e) => {
                   const val = e.target.value;
                   const slug = handleSlugGen(val);
-                  setEditingItem({ ...editingItem, name: val, title: val, slug });
+                  setEditingItem({
+                    ...editingItem,
+                    name: val,
+                    title: val,
+                    ...(entity !== 'documents' ? { slug } : {})
+                  });
                 }}
                 className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
               />
             </div>
 
             {/* Web Link */}
-            {editingItem.slug !== undefined && (
+            {editingItem.slug !== undefined && entity !== 'documents' && (
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
                   Web Link URL Address <span className="text-[10px] text-gray-500 font-normal lowercase">(Automatically generated from title)</span>
@@ -500,6 +543,7 @@ export const AdminCRUD: React.FC = () => {
               <thead className="bg-industrial-light text-industrial-dark uppercase font-bold text-[10px] tracking-wider border-b border-industrial-border">
                 <tr>
                   <th className="p-3">Title / Name</th>
+                  {entity === 'documents' && <th className="p-3">Category</th>}
                   {entity !== 'documents' && <th className="p-3">Web Link URL</th>}
                   <th className="p-3">Status</th>
                   <th className="p-3 text-right">Actions</th>
@@ -511,6 +555,13 @@ export const AdminCRUD: React.FC = () => {
                   .map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/50">
                       <td className="p-3 font-semibold text-industrial-dark">{item.name || item.title}</td>
+                      {entity === 'documents' && (
+                        <td className="p-3">
+                          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-industrial-light text-industrial-dark border border-industrial-border">
+                            {item.category || 'Catalogues'}
+                          </span>
+                        </td>
+                      )}
                       {entity !== 'documents' && (
                         <td className="p-3 font-mono text-gray-500 text-[10px]">/{item.slug || item.id}</td>
                       )}
