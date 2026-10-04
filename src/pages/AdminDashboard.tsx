@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   Package,
   Briefcase,
   FileText,
   Mail,
+  HelpCircle,
+  ArrowRight,
 } from 'lucide-react';
 import { getProducts } from '../services/products.service';
 import { getProjects } from '../services/projects.service';
@@ -121,6 +123,26 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Staff Handbook Banner */}
+          <div className="bg-gradient-to-r from-industrial-dark to-gray-800 text-white p-5 rounded-lg border border-industrial-slate shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
+            <div className="flex items-center space-x-3.5">
+              <div className="p-2.5 bg-industrial-orange/20 text-industrial-orange rounded-lg border border-industrial-orange/30 shrink-0">
+                <HelpCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Need help managing products or website info?</h3>
+                <p className="text-xs text-gray-300 mt-0.5">Read our simple step-by-step Staff Handbook & Live Website Impact Guide.</p>
+              </div>
+            </div>
+            <Link
+              to="/admin/guide"
+              className="bg-industrial-orange hover:bg-industrial-orange/90 text-white px-4 py-2 rounded text-xs font-bold transition-colors inline-flex items-center justify-center space-x-1.5 shrink-0"
+            >
+              <span>Open How-To Guide</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
 
           {/* Quick Enquiries Panel */}

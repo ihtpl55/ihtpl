@@ -20,6 +20,7 @@ import { Contact } from './pages/Contact';
 import { AdminLogin } from './pages/AdminLogin';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminCRUD } from './pages/AdminCRUD';
+import { AdminGuide } from './pages/AdminGuide';
 import { AdminLayout } from './components/common/AdminLayout';
 import { NotFound } from './pages/NotFound';
 
@@ -35,6 +36,7 @@ export const App: React.FC = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="crud/:entity" element={<AdminCRUD />} />
+          <Route path="guide" element={<AdminGuide />} />
         </Route>
 
         {/* Public Website Shell */}
