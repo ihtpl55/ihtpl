@@ -53,7 +53,19 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
           <div className="pt-2 text-xs space-y-2 text-gray-300">
             <div className="flex items-start">
               <MapPin className="w-4 h-4 text-industrial-orange mr-2 shrink-0 mt-0.5" />
-              <span>{settings.address}</span>
+              {settings.googleMapsUrl ? (
+                <a
+                  href={settings.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-industrial-orange transition-colors"
+                  title="Open location on Google Maps"
+                >
+                  {settings.address}
+                </a>
+              ) : (
+                <span>{settings.address}</span>
+              )}
             </div>
             <div className="flex items-center">
               <Phone className="w-4 h-4 text-industrial-orange mr-2 shrink-0" />

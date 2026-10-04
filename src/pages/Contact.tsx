@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { ChevronRight, Phone, Mail, MapPin, Clock, Send, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ChevronRight, Phone, Mail, MapPin, Clock, Send, ShieldCheck, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
 import { submitEnquiry } from '../services/enquiries.service';
 import { getSiteSettings } from '../services/settings.service';
 import { SiteSettings } from '../types';
@@ -109,6 +109,19 @@ export const Contact: React.FC = () => {
                   <div>
                     <div className="font-bold text-white mb-0.5">Central Address</div>
                     <div className="text-gray-300 leading-relaxed">{settings.address}</div>
+                    {settings.googleMapsUrl && (
+                      <div className="mt-1.5">
+                        <a
+                          href={settings.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-[11px] font-bold text-industrial-orange hover:underline"
+                        >
+                          <span>Get Directions on Google Maps</span>
+                          <ExternalLink className="w-3 h-3 ml-1" />
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -138,12 +151,38 @@ export const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Map Placeholder Card */}
-            <div className="bg-industrial-light p-4 rounded-lg border border-industrial-border h-48 flex items-center justify-center text-center">
-              <div>
-                <MapPin className="w-8 h-8 text-industrial-orange mx-auto mb-2" />
-                <div className="text-xs font-bold text-industrial-dark">MIDC Industrial Area Hub</div>
-                <div className="text-[11px] text-industrial-muted mt-1">Andheri East Logistics Corridor, Mumbai</div>
+            {/* Interactive Location & Google Maps Card */}
+            <div className="bg-white rounded-lg border border-industrial-border overflow-hidden shadow-subtle">
+              <div className="relative h-44 w-full bg-industrial-light">
+                <iframe
+                  title="Office & Facility Location Map"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(settings.address || 'Infinite Hardware Technology')}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  allowFullScreen
+                ></iframe>
+              </div>
+
+              <div className="p-4 bg-industrial-light/80 border-t border-industrial-border flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-left min-w-0">
+                  <div className="text-xs font-bold text-industrial-dark flex items-center">
+                    <MapPin className="w-3.5 h-3.5 text-industrial-orange mr-1.5 shrink-0" />
+                    <span>Office & Logistics Hub</span>
+                  </div>
+                  <div className="text-[11px] text-industrial-muted truncate max-w-xs mt-0.5">
+                    {settings.address || 'Corporate Facility'}
+                  </div>
+                </div>
+
+                <a
+                  href={settings.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(settings.address || 'Infinite Hardware')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2 bg-industrial-orange hover:bg-industrial-orange-hover text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shrink-0 shadow-sm"
+                >
+                  <span>Open in Google Maps</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
             </div>
           </div>
