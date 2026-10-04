@@ -15,7 +15,6 @@ import { getProducts } from '../services/products.service';
 import { getIndustries } from '../services/industries.service';
 import { getCapabilities } from '../services/capabilities.service';
 import { getProjects } from '../services/projects.service';
-import { getCertifications } from '../services/certifications.service';
 import { getPosts } from '../services/posts.service';
 import {
   HomepageConfig,
@@ -24,7 +23,6 @@ import {
   Industry,
   Capability,
   Project,
-  Certification,
   BlogPost,
 } from '../types';
 const defaultHomepageConfig: HomepageConfig = {
@@ -58,7 +56,6 @@ export const Home: React.FC = () => {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [capabilities, setCapabilities] = useState<Capability[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,17 +67,15 @@ export const Home: React.FC = () => {
       getIndustries(),
       getCapabilities(),
       getProjects(),
-      getCertifications(),
       getPosts(),
     ])
-      .then(([cfg, cats, prods, inds, caps, projs, certs, pstList]) => {
+      .then(([cfg, cats, prods, inds, caps, projs, pstList]) => {
         setConfig(cfg);
         setCategories(cats.slice(0, 8));
         setFeaturedProducts(prods.filter((p) => p.featured).slice(0, 6));
         setIndustries(inds.slice(0, 6));
         setCapabilities(caps.slice(0, 4));
         setProjects(projs.slice(0, 3));
-        setCertifications(certs.slice(0, 3));
         setPosts(pstList.slice(0, 3));
         setLoading(false);
       })

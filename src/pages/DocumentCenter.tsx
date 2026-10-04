@@ -2,20 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, FileText, Download, Search, Filter } from 'lucide-react';
 import { getDocuments, getDocumentCategories } from '../services/documents.service';
-import { getCertifications } from '../services/certifications.service';
-import { DocumentItem, Certification } from '../types';
+import { DocumentItem } from '../types';
 
 export const DocumentCenter: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
   const [docCategories, setDocCategories] = useState<string[]>([]);
   const [selectedCat, setSelectedCat] = useState<string>('All');
   const [search, setSearch] = useState<string>('');
 
   useEffect(() => {
-    Promise.all([getDocuments(), getCertifications(), getDocumentCategories()]).then(([docs, certs, cats]) => {
+    Promise.all([getDocuments(), getDocumentCategories()]).then(([docs, cats]) => {
       setDocuments(docs);
-      setCertifications(certs);
       setDocCategories(cats);
     });
   }, []);

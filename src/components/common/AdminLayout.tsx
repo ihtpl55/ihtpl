@@ -16,7 +16,6 @@ import {
   X,
   Building2,
   Wrench,
-  Award,
 } from 'lucide-react';
 import { subscribeAuth, logoutAdmin } from '../../services/auth.service';
 import { getEnquiries } from '../../services/enquiries.service';
@@ -81,7 +80,6 @@ export const AdminLayout: React.FC = () => {
     { label: 'Industries Served', path: '/admin/crud/industries', icon: Building2 },
     { label: 'Capabilities & Services', path: '/admin/crud/capabilities', icon: Wrench },
     { label: 'Media Gallery', path: '/admin/crud/gallery', icon: ImageIcon },
-    { label: 'Certifications', path: '/admin/crud/certifications', icon: Award },
     { label: 'Brands', path: '/admin/crud/brands', icon: Tag },
     { label: 'Case Studies / Projects', path: '/admin/crud/projects', icon: Briefcase },
     { label: 'Document Library', path: '/admin/crud/documents', icon: FileText },
