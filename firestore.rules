@@ -65,7 +65,7 @@ service cloud.firestore {
       allow write: if isAuthorizedAdmin();
     }
 
-    match /settings/general {
+    match /settings/{settingId} {
       allow read: if true;
       allow write: if isAuthorizedAdmin();
     }

@@ -21,18 +21,23 @@ export const getDocumentCategories = async (): Promise<string[]> => {
     categories = saved ? JSON.parse(saved) : DEFAULT_DOCUMENT_CATEGORIES;
   } else if (db) {
     try {
-      const snap = await getDoc(doc(db, 'settings', 'document_categories'));
-      if (snap.exists() && Array.isArray(snap.data()?.categories)) {
-        categories = snap.data()?.categories;
+      const snap = await getDoc(doc(db, 'settings', 'general'));
+      if (snap.exists() && Array.isArray(snap.data()?.documentCategories) && snap.data()?.documentCategories.length > 0) {
+        categories = snap.data()?.documentCategories;
       } else {
         categories = DEFAULT_DOCUMENT_CATEGORIES;
-        setDoc(doc(db, 'settings', 'document_categories'), { categories: DEFAULT_DOCUMENT_CATEGORIES }, { merge: true }).catch(() => {});
+        setDoc(doc(db, 'settings', 'general'), { documentCategories: DEFAULT_DOCUMENT_CATEGORIES }, { merge: true }).catch(() => {});
       }
     } catch {
       categories = DEFAULT_DOCUMENT_CATEGORIES;
     }
   } else {
     categories = DEFAULT_DOCUMENT_CATEGORIES;
+  }
+
+  if (!categories || categories.length === 0) {
+    const saved = localStorage.getItem(CATEGORIES_KEY);
+    categories = saved ? JSON.parse(saved) : DEFAULT_DOCUMENT_CATEGORIES;
   }
 
   return categories;
@@ -46,10 +51,14 @@ export const saveDocumentCategory = async (newCategory: string): Promise<string[
   if (current.includes(trimmed)) return current;
 
   const updated = [...current, trimmed];
-  if (USE_DEMO_DATA) {
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
-  } else if (db) {
-    await setDoc(doc(db, 'settings', 'document_categories'), { categories: updated }, { merge: true });
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(updated));
+
+  if (db) {
+    try {
+      await setDoc(doc(db, 'settings', 'general'), { documentCategories: updated }, { merge: true });
+    } catch (err) {
+      console.warn('Could not save category to settings/general:', err);
+    }
   }
   return updated;
 };
@@ -60,8 +69,9 @@ export const deleteDocumentCategory = async (categoryToDelete: string): Promise<
   const finalCategories = updated.length > 0 ? updated : ['Catalogues'];
   const fallbackCategory = finalCategories[0];
 
+  localStorage.setItem(CATEGORIES_KEY, JSON.stringify(finalCategories));
+
   if (USE_DEMO_DATA) {
-    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(finalCategories));
     const docs = getLocalDocuments();
     let changed = false;
     docs.forEach((d) => {
@@ -78,16 +88,21 @@ export const deleteDocumentCategory = async (categoryToDelete: string): Promise<
 
   if (db) {
     const firestoreDb = db;
-    await setDoc(doc(firestoreDb, 'settings', 'document_categories'), { categories: finalCategories });
+    try {
+      await setDoc(doc(firestoreDb, 'settings', 'general'), { documentCategories: finalCategories }, { merge: true });
+    } catch (err) {
+      console.warn('Could not save updated categories list to settings/general:', err);
+    }
 
     try {
-      const snap = await getDocs(query(collection(firestoreDb, 'documents'), where('category', '==', categoryToDelete)));
-      const promises = snap.docs.map((d) =>
+      const snap = await getDocs(collection(firestoreDb, 'documents'));
+      const matchingDocs = snap.docs.filter((d) => d.data().category === categoryToDelete);
+      const promises = matchingDocs.map((d) =>
         setDoc(doc(firestoreDb, 'documents', d.id), { category: fallbackCategory }, { merge: true })
       );
       await Promise.all(promises);
     } catch (err) {
-      console.warn('Could not reassign documents for deleted category', err);
+      console.warn('Could not reassign documents for deleted category:', err);
     }
   }
 

@@ -69,31 +69,32 @@ export const AdminCRUD: React.FC = () => {
     }
   };
 
-  const existingDocCategories = docCategories.length > 0
-    ? docCategories
-    : Array.from(
-        new Set([
-          'Certifications',
-          'Catalogues',
-          'Technical Documents',
-          'Approvals',
-          'Company Documents',
-          ...items.map((i: any) => i.category).filter(Boolean),
-        ])
-      );
+  const existingDocCategories = Array.from(
+    new Set([
+      ...docCategories,
+      ...items.map((i: any) => i.category).filter(Boolean),
+    ])
+  );
 
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
-    setCategoryActionLoading(true);
-    const updated = await saveDocumentCategory(newCategoryName.trim());
-    setDocCategories(updated);
-    setNewCategoryName('');
-    setCategoryActionLoading(false);
+    try {
+      setCategoryActionLoading(true);
+      const updated = await saveDocumentCategory(newCategoryName.trim());
+      setDocCategories(updated);
+      setNewCategoryName('');
+      setMessage(`Category "${newCategoryName.trim()}" created successfully.`);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err: any) {
+      alert(`Could not create category: ${err.message || err}`);
+    } finally {
+      setCategoryActionLoading(false);
+    }
   };
 
   const handleDeleteCategory = async (catToDelete: string, docCount: number) => {
-    const remainingCats = docCategories.filter((c) => c !== catToDelete);
+    const remainingCats = existingDocCategories.filter((c) => c !== catToDelete);
     const fallbackCat = remainingCats[0] || 'Catalogues';
 
     const confirmMsg =
@@ -103,15 +104,22 @@ export const AdminCRUD: React.FC = () => {
 
     if (!window.confirm(confirmMsg)) return;
 
-    setCategoryActionLoading(true);
-    const updated = await deleteDocumentCategory(catToDelete);
-    setDocCategories(updated);
-    const freshDocs = await getDocuments(false);
-    setItems(freshDocs);
-    if (editingItem && editingItem.category === catToDelete) {
-      setEditingItem({ ...editingItem, category: updated[0] });
+    try {
+      setCategoryActionLoading(true);
+      const updated = await deleteDocumentCategory(catToDelete);
+      setDocCategories(updated);
+      const freshDocs = await getDocuments(false);
+      setItems(freshDocs);
+      if (editingItem && editingItem.category === catToDelete) {
+        setEditingItem({ ...editingItem, category: updated[0] || fallbackCat });
+      }
+      setMessage(`Category "${catToDelete}" deleted successfully.`);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err: any) {
+      alert(`Could not delete category: ${err.message || err}`);
+    } finally {
+      setCategoryActionLoading(false);
     }
-    setCategoryActionLoading(false);
   };
 
   const handleSlugGen = (name: string) => {
@@ -821,10 +829,10 @@ export const AdminCRUD: React.FC = () => {
             {/* List of existing categories with delete action */}
             <div>
               <label className="block text-[11px] font-bold uppercase text-industrial-dark mb-2">
-                Existing Categories ({docCategories.length})
+                Existing Categories ({existingDocCategories.length})
               </label>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1 divide-y divide-gray-100">
-                {docCategories.map((cat) => {
+                {existingDocCategories.map((cat) => {
                   const docCount = items.filter((d) => d.category === cat).length;
                   return (
                     <div
@@ -840,11 +848,11 @@ export const AdminCRUD: React.FC = () => {
 
                       <button
                         type="button"
-                        disabled={categoryActionLoading || docCategories.length <= 1}
+                        disabled={categoryActionLoading || existingDocCategories.length <= 1}
                         onClick={() => handleDeleteCategory(cat, docCount)}
                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
                         title={
-                          docCategories.length <= 1
+                          existingDocCategories.length <= 1
                             ? 'Cannot delete the only remaining category'
                             : `Delete "${cat}"`
                         }
