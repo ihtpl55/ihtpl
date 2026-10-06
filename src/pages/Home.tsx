@@ -132,24 +132,6 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Metrics Strip */}
-      <section className="bg-industrial-slate border-b border-industrial-steel text-white py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-industrial-steel">
-            {config.trustMetrics.map((metric, idx) => (
-              <div key={idx} className={idx !== 0 ? 'pt-4 sm:pt-0 sm:pl-6' : ''}>
-                <div className="text-2xl sm:text-4xl font-black text-industrial-orange tracking-tight">
-                  {metric.value}
-                </div>
-                <div className="text-xs font-semibold uppercase text-gray-300 tracking-wider mt-1">
-                  {metric.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Product Categories */}
       <section className="py-12 sm:py-20 bg-industrial-light border-b border-industrial-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
