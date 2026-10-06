@@ -44,6 +44,18 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
     return location.pathname.startsWith(path);
   };
 
+  const nav = settings.navVisibility || {};
+  const showProducts = nav.products !== false;
+  const showIndustries = nav.industries !== false;
+  const showCapabilities = nav.capabilities !== false;
+  const showProjects = nav.projects !== false;
+  const showDocuments = nav.documents !== false;
+  const showGallery = nav.gallery !== false;
+  const showInsights = nav.insights !== false;
+  const showResources = showDocuments || showGallery || showInsights;
+  const showAbout = nav.about !== false;
+  const showContact = nav.contact !== false;
+
   return (
     <header className="w-full z-40 sticky top-0 transition-all duration-300">
       {/* Top Bar */}
@@ -67,9 +79,11 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
               <ShieldCheck className="w-3.5 h-3.5 mr-1 text-industrial-orange" />
               Strengthen Engineering for Nation
             </span>
-            <Link to="/resources/documents" className="text-gray-300 hover:text-white transition-colors">
-              Document Center
-            </Link>
+            {showDocuments && (
+              <Link to="/resources/documents" className="text-gray-300 hover:text-white transition-colors">
+                Document Center
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -103,81 +117,106 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
             >
               Home
             </Link>
-            <Link
-              to="/products"
-              className={`text-sm font-semibold transition-colors ${isActive('/products') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-            >
-              Products
-            </Link>
-            <Link
-              to="/industries"
-              className={`text-sm font-semibold transition-colors ${isActive('/industries') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-            >
-              Industries
-            </Link>
-            <Link
-              to="/capabilities"
-              className={`text-sm font-semibold transition-colors ${isActive('/capabilities') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-            >
-              Capabilities
-            </Link>
-            <Link
-              to="/projects"
-              className={`text-sm font-semibold transition-colors ${isActive('/projects') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-            >
-              Projects
-            </Link>
+
+            {showProducts && (
+              <Link
+                to="/products"
+                className={`text-sm font-semibold transition-colors ${isActive('/products') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+              >
+                Products
+              </Link>
+            )}
+
+            {showIndustries && (
+              <Link
+                to="/industries"
+                className={`text-sm font-semibold transition-colors ${isActive('/industries') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+              >
+                Industries
+              </Link>
+            )}
+
+            {showCapabilities && (
+              <Link
+                to="/capabilities"
+                className={`text-sm font-semibold transition-colors ${isActive('/capabilities') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+              >
+                Capabilities
+              </Link>
+            )}
+
+            {showProjects && (
+              <Link
+                to="/projects"
+                className={`text-sm font-semibold transition-colors ${isActive('/projects') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+              >
+                Projects
+              </Link>
+            )}
 
             {/* Resources Dropdown */}
-            <div className="relative" onMouseEnter={() => setResourcesDropdownOpen(true)} onMouseLeave={() => setResourcesDropdownOpen(false)}>
-              <button
-                className={`text-sm font-semibold flex items-center transition-colors ${isActive('/resources') || isActive('/gallery') || isActive('/insights') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-              >
-                <span>Resources</span>
-                <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
-              </button>
+            {showResources && (
+              <div className="relative" onMouseEnter={() => setResourcesDropdownOpen(true)} onMouseLeave={() => setResourcesDropdownOpen(false)}>
+                <button
+                  className={`text-sm font-semibold flex items-center transition-colors ${isActive('/resources') || isActive('/gallery') || isActive('/insights') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+                >
+                  <span>Resources</span>
+                  <ChevronDown className="w-4 h-4 ml-1 opacity-70" />
+                </button>
 
-              {resourcesDropdownOpen && (
-                <div className="absolute top-full left-0 w-56 pt-2 z-50 animate-fadeIn">
-                  <div className="bg-white rounded-md shadow-elevated border border-industrial-border py-2">
-                    <Link
-                      to="/resources/documents"
-                      className="flex items-center px-4 py-2 text-sm text-industrial-dark hover:bg-industrial-light hover:text-industrial-orange transition-colors"
-                    >
-                      <FileText className="w-4 h-4 mr-2.5 text-industrial-orange" />
-                      Document Center
-                    </Link>
-                    <Link
-                      to="/gallery"
-                      className="flex items-center px-4 py-2 text-sm text-industrial-dark hover:bg-industrial-light hover:text-industrial-orange transition-colors"
-                    >
-                      <ImageIcon className="w-4 h-4 mr-2.5 text-industrial-orange" />
-                      Media Gallery
-                    </Link>
-                    <Link
-                      to="/insights"
-                      className="flex items-center px-4 py-2 text-sm text-industrial-dark hover:bg-industrial-light hover:text-industrial-orange transition-colors"
-                    >
-                      <BookOpen className="w-4 h-4 mr-2.5 text-industrial-orange" />
-                      Industry Insights
-                    </Link>
+                {resourcesDropdownOpen && (
+                  <div className="absolute top-full left-0 w-56 pt-2 z-50 animate-fadeIn">
+                    <div className="bg-white rounded-md shadow-elevated border border-industrial-border py-2">
+                      {showDocuments && (
+                        <Link
+                          to="/resources/documents"
+                          className="flex items-center px-4 py-2 text-sm text-industrial-dark hover:bg-industrial-light hover:text-industrial-orange transition-colors"
+                        >
+                          <FileText className="w-4 h-4 mr-2.5 text-industrial-orange" />
+                          Document Center
+                        </Link>
+                      )}
+                      {showGallery && (
+                        <Link
+                          to="/gallery"
+                          className="flex items-center px-4 py-2 text-sm text-industrial-dark hover:bg-industrial-light hover:text-industrial-orange transition-colors"
+                        >
+                          <ImageIcon className="w-4 h-4 mr-2.5 text-industrial-orange" />
+                          Media Gallery
+                        </Link>
+                      )}
+                      {showInsights && (
+                        <Link
+                          to="/insights"
+                          className="flex items-center px-4 py-2 text-sm text-industrial-dark hover:bg-industrial-light hover:text-industrial-orange transition-colors"
+                        >
+                          <BookOpen className="w-4 h-4 mr-2.5 text-industrial-orange" />
+                          Industry Insights
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
-            <Link
-              to="/about"
-              className={`text-sm font-semibold transition-colors ${isActive('/about') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className={`text-sm font-semibold transition-colors ${isActive('/contact') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
-            >
-              Contact
-            </Link>
+            {showAbout && (
+              <Link
+                to="/about"
+                className={`text-sm font-semibold transition-colors ${isActive('/about') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+              >
+                About
+              </Link>
+            )}
+
+            {showContact && (
+              <Link
+                to="/contact"
+                className={`text-sm font-semibold transition-colors ${isActive('/contact') ? 'text-industrial-orange' : 'text-industrial-dark hover:text-industrial-orange'}`}
+              >
+                Contact
+              </Link>
+            )}
           </nav>
 
           {/* Right Actions */}
@@ -190,12 +229,14 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
               <Search className="w-5 h-5" />
             </button>
 
-            <Link
-              to="/contact"
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded text-sm font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-colors shadow-sm"
-            >
-              Contact Sales
-            </Link>
+            {showContact && (
+              <Link
+                to="/contact"
+                className="hidden sm:inline-flex items-center px-4 py-2 rounded text-sm font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-colors shadow-sm"
+              >
+                Contact Sales
+              </Link>
+            )}
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -227,49 +268,79 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
                 <Link to="/" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
                   Home
                 </Link>
-                <Link to="/products" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
-                  Products
-                </Link>
-                <Link to="/industries" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
-                  Industries
-                </Link>
-                <Link to="/capabilities" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
-                  Capabilities
-                </Link>
-                <Link to="/projects" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
-                  Projects
-                </Link>
-                <div className="pt-2 border-t border-industrial-border">
-                  <div className="text-xs font-bold uppercase text-industrial-muted tracking-wider mb-2">Resources</div>
-                  <Link to="/resources/documents" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
-                    Document Center
+
+                {showProducts && (
+                  <Link to="/products" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
+                    Products
                   </Link>
-                  <Link to="/gallery" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
-                    Gallery
+                )}
+
+                {showIndustries && (
+                  <Link to="/industries" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
+                    Industries
                   </Link>
-                  <Link to="/insights" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
-                    Insights
+                )}
+
+                {showCapabilities && (
+                  <Link to="/capabilities" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
+                    Capabilities
                   </Link>
-                </div>
-                <div className="pt-2 border-t border-industrial-border">
-                  <Link to="/about" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
-                    About Us
+                )}
+
+                {showProjects && (
+                  <Link to="/projects" className="block text-base font-semibold text-industrial-dark hover:text-industrial-orange">
+                    Projects
                   </Link>
-                  <Link to="/contact" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
-                    Contact Us
-                  </Link>
-                </div>
+                )}
+
+                {showResources && (
+                  <div className="pt-2 border-t border-industrial-border">
+                    <div className="text-xs font-bold uppercase text-industrial-muted tracking-wider mb-2">Resources</div>
+                    {showDocuments && (
+                      <Link to="/resources/documents" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
+                        Document Center
+                      </Link>
+                    )}
+                    {showGallery && (
+                      <Link to="/gallery" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
+                        Gallery
+                      </Link>
+                    )}
+                    {showInsights && (
+                      <Link to="/insights" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
+                        Insights
+                      </Link>
+                    )}
+                  </div>
+                )}
+
+                {(showAbout || showContact) && (
+                  <div className="pt-2 border-t border-industrial-border">
+                    {showAbout && (
+                      <Link to="/about" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
+                        About Us
+                      </Link>
+                    )}
+                    {showContact && (
+                      <Link to="/contact" className="block py-1 text-sm font-medium text-industrial-dark hover:text-industrial-orange">
+                        Contact Us
+                      </Link>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="pt-6 border-t border-industrial-border space-y-3">
-              <Link
-                to="/contact"
-                className="w-full text-center py-3 bg-industrial-orange text-white font-bold rounded shadow-sm hover:bg-industrial-orange-hover block text-sm"
-              >
-                Enquire Now
-              </Link>
-            </div>
+            {showContact && (
+              <div className="pt-6 border-t border-industrial-border space-y-3">
+                <Link
+                  to="/contact"
+                  className="w-full text-center py-3 bg-industrial-orange text-white font-bold rounded shadow-sm hover:bg-industrial-orange-hover block text-sm"
+                >
+                  Enquire Now
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}

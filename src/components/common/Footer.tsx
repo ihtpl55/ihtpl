@@ -14,6 +14,17 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
   useEffect(() => {
     getCategories().then((cats) => setCategories(cats)).catch(() => {});
   }, []);
+  const nav = settings.navVisibility || {};
+  const showProducts = nav.products !== false;
+  const showIndustries = nav.industries !== false;
+  const showCapabilities = nav.capabilities !== false;
+  const showProjects = nav.projects !== false;
+  const showDocuments = nav.documents !== false;
+  const showGallery = nav.gallery !== false;
+  const showInsights = nav.insights !== false;
+  const showAbout = nav.about !== false;
+  const showContact = nav.contact !== false;
+
   return (
     <footer className="bg-industrial-dark text-white border-t border-industrial-slate">
       {/* Top Banner */}
@@ -24,19 +35,23 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
             <p className="text-xs text-gray-400 mt-1">Strengthen Engineering for Nation — Bridge Bearings, Expansion Joints & Couplings.</p>
           </div>
           <div className="flex items-center space-x-3 shrink-0">
-            <a
-              href={`tel:${settings.phone.replace(/[^0-9+]/g, '')}`}
-              className="inline-flex items-center px-4 py-2.5 rounded text-sm font-bold bg-white text-industrial-dark hover:bg-gray-100 transition-colors"
-            >
-              <Phone className="w-4 h-4 mr-2 text-industrial-orange" />
-              Call {settings.phone}
-            </a>
-            <Link
-              to="/contact"
-              className="inline-flex items-center px-4 py-2.5 rounded text-sm font-bold bg-industrial-orange text-white hover:bg-industrial-orange-hover transition-colors"
-            >
-              Request Project Quote
-            </Link>
+            {settings.phone && (
+              <a
+                href={`tel:${settings.phone.replace(/[^0-9+]/g, '')}`}
+                className="inline-flex items-center px-4 py-2.5 rounded text-sm font-bold bg-white text-industrial-dark hover:bg-gray-100 transition-colors"
+              >
+                <Phone className="w-4 h-4 mr-2 text-industrial-orange" />
+                Call {settings.phone}
+              </a>
+            )}
+            {showContact && (
+              <Link
+                to="/contact"
+                className="inline-flex items-center px-4 py-2.5 rounded text-sm font-bold bg-industrial-orange text-white hover:bg-industrial-orange-hover transition-colors"
+              >
+                Request Project Quote
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -73,52 +88,58 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
                 <span>{settings.address}</span>
               )}
             </div>
-            <div className="flex items-center">
-              <Phone className="w-4 h-4 text-industrial-orange mr-2 shrink-0" />
-              <span>{settings.phone} {settings.altPhone ? `/ ${settings.altPhone}` : ''}</span>
-            </div>
-            <div className="flex items-center">
-              <Mail className="w-4 h-4 text-industrial-orange mr-2 shrink-0" />
-              <span>{settings.email}</span>
-            </div>
+            {settings.phone && (
+              <div className="flex items-center">
+                <Phone className="w-4 h-4 text-industrial-orange mr-2 shrink-0" />
+                <span>{settings.phone} {settings.altPhone ? `/ ${settings.altPhone}` : ''}</span>
+              </div>
+            )}
+            {settings.email && (
+              <div className="flex items-center">
+                <Mail className="w-4 h-4 text-industrial-orange mr-2 shrink-0" />
+                <span>{settings.email}</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Column 2: Products & Catalog */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-industrial-orange mb-4">Products</h4>
-          <ul className="space-y-2.5 text-xs text-gray-400">
-            {categories.length > 0 ? (
-              categories.slice(0, 5).map((cat) => (
-                <li key={cat.id}>
-                  <Link
-                    to={`/products?category=${cat.slug || cat.id}`}
-                    className="hover:text-white transition-colors"
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))
-            ) : (
-              <>
-                <li><Link to="/products?category=bridge-bearings" className="hover:text-white transition-colors">Bridge Bearings</Link></li>
-                <li><Link to="/products?category=expansion-joints" className="hover:text-white transition-colors">Expansion Joints</Link></li>
-                <li><Link to="/products?category=industrial-couplings" className="hover:text-white transition-colors">Industrial Couplings</Link></li>
-              </>
-            )}
-            <li><Link to="/products" className="text-industrial-orange hover:underline font-semibold mt-1 inline-block">Full Product Catalog →</Link></li>
-          </ul>
-        </div>
+        {showProducts && (
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-industrial-orange mb-4">Products</h4>
+            <ul className="space-y-2.5 text-xs text-gray-400">
+              {categories.length > 0 ? (
+                categories.slice(0, 5).map((cat) => (
+                  <li key={cat.id}>
+                    <Link
+                      to={`/products?category=${cat.slug || cat.id}`}
+                      className="hover:text-white transition-colors"
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li><Link to="/products?category=bridge-bearings" className="hover:text-white transition-colors">Bridge Bearings</Link></li>
+                  <li><Link to="/products?category=expansion-joints" className="hover:text-white transition-colors">Expansion Joints</Link></li>
+                  <li><Link to="/products?category=industrial-couplings" className="hover:text-white transition-colors">Industrial Couplings</Link></li>
+                </>
+              )}
+              <li><Link to="/products" className="text-industrial-orange hover:underline font-semibold mt-1 inline-block">Full Product Catalog →</Link></li>
+            </ul>
+          </div>
+        )}
 
         {/* Column 3: Corporate & Sectors */}
         <div>
           <h4 className="text-xs font-bold uppercase tracking-wider text-industrial-orange mb-4">Corporate</h4>
           <ul className="space-y-2.5 text-xs text-gray-400">
-            <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
-            <li><Link to="/industries" className="hover:text-white transition-colors">Industries Served</Link></li>
-            <li><Link to="/capabilities" className="hover:text-white transition-colors">Services & Capabilities</Link></li>
-            <li><Link to="/infrastructure" className="hover:text-white transition-colors">Infrastructure</Link></li>
-            <li><Link to="/projects" className="hover:text-white transition-colors">Projects & Case Studies</Link></li>
+            {showAbout && <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>}
+            {showIndustries && <li><Link to="/industries" className="hover:text-white transition-colors">Industries Served</Link></li>}
+            {showCapabilities && <li><Link to="/capabilities" className="hover:text-white transition-colors">Services & Capabilities</Link></li>}
+            {showAbout && <li><Link to="/infrastructure" className="hover:text-white transition-colors">Infrastructure</Link></li>}
+            {showProjects && <li><Link to="/projects" className="hover:text-white transition-colors">Projects & Case Studies</Link></li>}
           </ul>
         </div>
 
@@ -126,10 +147,10 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
         <div>
           <h4 className="text-xs font-bold uppercase tracking-wider text-industrial-orange mb-4">Resources</h4>
           <ul className="space-y-2.5 text-xs text-gray-400">
-            <li><Link to="/resources/documents" className="hover:text-white transition-colors">Document Center</Link></li>
-            <li><Link to="/gallery" className="hover:text-white transition-colors">Media Gallery</Link></li>
-            <li><Link to="/insights" className="hover:text-white transition-colors">Technical Insights</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors">Contact Sales Engineering</Link></li>
+            {showDocuments && <li><Link to="/resources/documents" className="hover:text-white transition-colors">Document Center</Link></li>}
+            {showGallery && <li><Link to="/gallery" className="hover:text-white transition-colors">Media Gallery</Link></li>}
+            {showInsights && <li><Link to="/insights" className="hover:text-white transition-colors">Technical Insights</Link></li>}
+            {showContact && <li><Link to="/contact" className="hover:text-white transition-colors">Contact Sales Engineering</Link></li>}
           </ul>
           <div className="mt-6 pt-4 border-t border-industrial-slate">
             <Link

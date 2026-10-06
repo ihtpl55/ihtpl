@@ -1,6 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Plus, Trash2, Edit3, Upload, CheckCircle, Save, ChevronLeft, ChevronRight, FolderTree, X } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  Edit3,
+  Upload,
+  CheckCircle,
+  Save,
+  ChevronLeft,
+  ChevronRight,
+  FolderTree,
+  X,
+  Eye,
+  EyeOff,
+  Compass,
+  Package,
+  Building2,
+  Wrench,
+  Briefcase,
+  FileText,
+  Image as ImageIcon,
+  BookOpen,
+  Info,
+  Phone,
+} from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct } from '../services/products.service';
 import { getCategories, saveCategory, deleteCategory } from '../services/categories.service';
 import { getBrands, saveBrand, deleteBrand } from '../services/brands.service';
@@ -13,7 +36,7 @@ import { getCertifications, saveCertification, deleteCertification } from '../se
 import { getPosts, savePost, deletePost } from '../services/posts.service';
 import { getSiteSettings, updateSiteSettings } from '../services/settings.service';
 import { uploadFile } from '../services/storage.service';
-import { Product, Category, Brand, Project, SiteSettings, Industry, Capability, GalleryItem, Certification, BlogPost } from '../types';
+import { Product, Category, Brand, Project, SiteSettings, NavigationVisibility, Industry, Capability, GalleryItem, Certification, BlogPost } from '../types';
 
 export const AdminCRUD: React.FC = () => {
   const { entity } = useParams<{ entity: string }>();
@@ -21,6 +44,7 @@ export const AdminCRUD: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [settingsItem, setSettingsItem] = useState<SiteSettings | null>(null);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [isNew, setIsNew] = useState(false);
@@ -36,6 +60,70 @@ export const AdminCRUD: React.FC = () => {
   const [categoryActionLoading, setCategoryActionLoading] = useState(false);
   const ITEMS_PER_PAGE = 10;
 
+  const allNavTabs: Array<{ key: keyof NavigationVisibility; label: string; path: string; icon: React.ElementType }> = [
+    { key: 'products', label: 'Products', path: '/products', icon: Package },
+    { key: 'industries', label: 'Industries', path: '/industries', icon: Building2 },
+    { key: 'capabilities', label: 'Capabilities', path: '/capabilities', icon: Wrench },
+    { key: 'projects', label: 'Projects', path: '/projects', icon: Briefcase },
+    { key: 'documents', label: 'Document Center', path: '/resources/documents', icon: FileText },
+    { key: 'gallery', label: 'Media Gallery', path: '/gallery', icon: ImageIcon },
+    { key: 'insights', label: 'Industry Insights', path: '/insights', icon: BookOpen },
+    { key: 'about', label: 'About Us', path: '/about', icon: Info },
+    { key: 'contact', label: 'Contact Us', path: '/contact', icon: Phone },
+  ];
+
+  const entityNavKeyMap: Record<string, keyof NavigationVisibility> = {
+    products: 'products',
+    industries: 'industries',
+    capabilities: 'capabilities',
+    projects: 'projects',
+    documents: 'documents',
+    gallery: 'gallery',
+    posts: 'insights',
+  };
+
+  const currentNavKey = entity ? entityNavKeyMap[entity] : undefined;
+  const isCurrentTabVisible =
+    siteSettings?.navVisibility && currentNavKey
+      ? siteSettings.navVisibility[currentNavKey] !== false
+      : true;
+
+  const handleToggleCurrentTabHeader = async () => {
+    if (!siteSettings || !currentNavKey) return;
+    const nextVal = !isCurrentTabVisible;
+    const updatedNav = {
+      ...(siteSettings.navVisibility || {}),
+      [currentNavKey]: nextVal,
+    };
+    const updatedSettings = {
+      ...siteSettings,
+      navVisibility: updatedNav,
+    };
+    setSiteSettings(updatedSettings);
+    await updateSiteSettings(updatedSettings);
+    setMessage(`The "${entity}" tab is now ${nextVal ? 'VISIBLE on' : 'HIDDEN from'} the main website.`);
+    setTimeout(() => setMessage(''), 4000);
+  };
+
+  const handleToggleNavTabInSettings = async (key: keyof NavigationVisibility) => {
+    if (!settingsItem) return;
+    const currentVal = settingsItem.navVisibility?.[key] !== false;
+    const nextVal = !currentVal;
+    const updatedNav = {
+      ...(settingsItem.navVisibility || {}),
+      [key]: nextVal,
+    };
+    const updatedSettings = {
+      ...settingsItem,
+      navVisibility: updatedNav,
+    };
+    setSettingsItem(updatedSettings);
+    setSiteSettings(updatedSettings);
+    await updateSiteSettings(updatedSettings);
+    setMessage(`Website Tab "${String(key)}" is now ${nextVal ? 'VISIBLE on' : 'HIDDEN from'} the main site.`);
+    setTimeout(() => setMessage(''), 3000);
+  };
+
   useEffect(() => {
     setCurrentPage(1);
     loadEntityData();
@@ -48,8 +136,12 @@ export const AdminCRUD: React.FC = () => {
     setIsCustomDocCat(false);
     setCustomDocCatInput('');
 
+    const liveSettings = await getSiteSettings(false);
+    setSiteSettings(liveSettings);
+
     if (entity === 'settings') {
       const settings = await getSiteSettings(true);
+      setSiteSettings(settings);
       setSettingsItem(settings);
     } else {
       const catList = await getCategories(false);
@@ -285,7 +377,35 @@ export const AdminCRUD: React.FC = () => {
         </div>
 
         {entity !== 'settings' && !editingItem && (
-          <div className="flex items-center space-x-2 self-start sm:self-auto">
+          <div className="flex items-center space-x-2 self-start sm:self-auto flex-wrap gap-y-2">
+            {currentNavKey && (
+              <button
+                type="button"
+                onClick={handleToggleCurrentTabHeader}
+                className={`px-3 py-2 rounded text-xs font-bold flex items-center space-x-1.5 transition-all border shadow-xs ${
+                  isCurrentTabVisible
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                    : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
+                }`}
+                title={
+                  isCurrentTabVisible
+                    ? 'This entire tab is currently VISIBLE on the website. Click to HIDE it.'
+                    : 'This entire tab is currently HIDDEN from the website. Click to SHOW it.'
+                }
+              >
+                {isCurrentTabVisible ? (
+                  <>
+                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Public Tab: Visible</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Public Tab: Hidden</span>
+                  </>
+                )}
+              </button>
+            )}
             {entity === 'documents' && (
               <button
                 type="button"
@@ -318,6 +438,74 @@ export const AdminCRUD: React.FC = () => {
       {entity === 'settings' && settingsItem && (
         <div className="bg-white p-6 rounded-lg border border-industrial-border shadow-subtle">
           <form onSubmit={handleSaveSettings} className="space-y-6 text-xs max-w-3xl">
+            {/* Website Navigation Tabs Visibility Control */}
+            <div className="bg-gray-50 border border-industrial-border rounded-lg p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-industrial-border pb-3">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-2">
+                    <Compass className="w-4 h-4 text-industrial-orange" />
+                    <span>Website Tabs Visibility (Show / Hide)</span>
+                  </h3>
+                  <p className="text-[11px] text-industrial-muted mt-0.5">
+                    Toggle which pages and tabs appear in the main navigation, mobile menu, and footer on the live website.
+                  </p>
+                </div>
+                <span className="text-[10px] bg-industrial-orange/10 text-industrial-orange font-bold px-2.5 py-1 rounded border border-industrial-orange/20 self-start sm:self-auto uppercase tracking-wider">
+                  Live Control
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {allNavTabs.map((tab) => {
+                  const isVisible = settingsItem.navVisibility?.[tab.key] !== false;
+                  const TabIcon = tab.icon;
+                  return (
+                    <div
+                      key={tab.key}
+                      className={`p-3 rounded-lg border transition-all flex items-center justify-between gap-2 ${
+                        isVisible
+                          ? 'bg-white border-industrial-border shadow-xs hover:border-gray-400'
+                          : 'bg-gray-100/80 border-dashed border-gray-300 opacity-75'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <div className={`p-2 rounded shrink-0 ${isVisible ? 'bg-industrial-dark text-white' : 'bg-gray-300 text-gray-600'}`}>
+                          <TabIcon className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-xs text-industrial-dark truncate">{tab.label}</div>
+                          <div className="text-[10px] text-gray-500 font-mono truncate">{tab.path}</div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleNavTabInSettings(tab.key)}
+                        className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-all shrink-0 flex items-center gap-1 ${
+                          isVisible
+                            ? 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800'
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                        }`}
+                        title={isVisible ? `Click to HIDE ${tab.label} from the website` : `Click to SHOW ${tab.label} on the website`}
+                      >
+                        {isVisible ? (
+                          <>
+                            <Eye className="w-3 h-3 text-emerald-600" />
+                            <span>Visible</span>
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="w-3 h-3 text-gray-500" />
+                            <span>Hidden</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">Phone Number (Primary)</label>

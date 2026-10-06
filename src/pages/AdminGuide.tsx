@@ -283,23 +283,25 @@ export const AdminGuide: React.FC = () => {
       livePath: '/contact',
       liveName: 'Header, Footer & Contact Page',
       icon: Settings,
-      summary: 'Manage your global company phone numbers, WhatsApp, official email, factory address, and Google Map.',
+      summary: 'Manage your global company phone numbers, WhatsApp, official email, address, Google Map, AND Show / Hide entire website tabs.',
       whatItDoes:
-        'This is the single source of truth for the entire website. When your phone number, email, or address changes, updating it here updates the entire website in one click.',
+        'This is the single source of truth for the entire website. Here you can update company contact details and also decide which entire tabs (Products, Industries, Projects, etc.) appear on the public website.',
       stepByStep: [
         'Open the Site Settings tab.',
+        'Under "Website Tabs Visibility", click any tab\'s button (Visible / Hidden) to immediately show or hide that whole page from the website.',
         'Update Phone Number, Mobile / WhatsApp, and Sales Email.',
         'Update your Factory / Office Physical Address.',
         'In the "Google Maps Link" field, paste your Google Maps link.',
         'Click "Save All Settings".',
       ],
       liveEffects: [
-        'Instantly updates the phone & email in the top website header.',
-        'Updates the company address, phones, and email in the website footer on all pages.',
+        'Instantly adds or removes entire tabs from the top header navigation, mobile drawer, and footer.',
+        'If a tab is hidden, visitors who type its URL directly are smoothly redirected home.',
+        'Instantly updates phone & email in the header, footer, and contact page.',
         'Updates the interactive map and "Get Directions" button on the /contact page.',
       ],
       dosAndDonts: {
-        do: 'Always check that your phone numbers include country code (e.g. +91) for click-to-call mobile visitors.',
+        do: 'Use the "Visible / Hidden" switches to easily hide tabs like Projects or Capabilities if you are still updating their content.',
         dont: "Don't leave the email or phone blank, as visitors won't be able to reach your sales team.",
       },
     },
@@ -418,18 +420,19 @@ export const AdminGuide: React.FC = () => {
                 2
               </div>
               <h3 className="font-bold text-sm text-industrial-dark mb-1.5 flex items-center gap-2">
-                <span>Hide vs Delete</span>
+                <span>Hide Items & Entire Tabs</span>
                 <ShieldAlert className="w-4 h-4 text-amber-600" />
               </h3>
               <p className="text-xs text-industrial-muted leading-relaxed">
-                If an item is out of stock or seasonally paused, <strong>do not delete it</strong>.
+                Need to hide a single product, or <strong>an entire tab (e.g. Projects)</strong>?
               </p>
               <p className="text-xs text-industrial-dark mt-2 leading-relaxed">
-                Simply edit the item and turn the <strong>"Published" switch OFF</strong>. This hides it safely from website visitors while keeping your images, specs, and descriptions intact in admin.
+                • <strong>Single Item:</strong> Edit it and turn "Published" OFF.<br />
+                • <strong>Full Tab:</strong> Toggle the "Public Tab: Visible / Hidden" button at the top of that tab's page, or use the master switches in <em>Site Settings</em>!
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-industrial-border text-[11px] text-amber-800 font-medium">
-              ⚠️ Deleting an item permanently deletes its text and specifications.
+              💡 Hiding preserves all your data safely while keeping it invisible to public visitors.
             </div>
           </div>
 

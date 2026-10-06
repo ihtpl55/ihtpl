@@ -1,6 +1,18 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
-import { SiteSettings } from '../types';
+import { NavigationVisibility, SiteSettings } from '../types';
+
+export const defaultNavVisibility: NavigationVisibility = {
+  products: true,
+  industries: true,
+  capabilities: true,
+  projects: true,
+  documents: true,
+  gallery: true,
+  insights: true,
+  about: true,
+  contact: true,
+};
 
 const emptySettings: SiteSettings = {
   companyName: 'Infinite Hardware Technology (P) Ltd.',
@@ -15,6 +27,7 @@ const emptySettings: SiteSettings = {
   googleMapsUrl: '',
   footerDescription: '',
   copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
+  navVisibility: defaultNavVisibility,
 };
 
 const STORAGE_KEY = 'infinite_site_settings_cache';
@@ -26,7 +39,15 @@ const getCachedSettings = (): SiteSettings => {
   const local = localStorage.getItem(STORAGE_KEY);
   if (local) {
     try {
-      memoryCache = JSON.parse(local);
+      const parsed = JSON.parse(local);
+      memoryCache = {
+        ...emptySettings,
+        ...parsed,
+        navVisibility: {
+          ...defaultNavVisibility,
+          ...(parsed.navVisibility || {}),
+        },
+      };
       return memoryCache!;
     } catch {
       return emptySettings;
@@ -60,7 +81,15 @@ export const getSiteSettings = async (forceFresh = false): Promise<SiteSettings>
       .then((snap) => {
         if (snap.exists()) {
           const freshData = snap.data() as SiteSettings;
-          setCachedSettings(freshData);
+          const normalized: SiteSettings = {
+            ...emptySettings,
+            ...freshData,
+            navVisibility: {
+              ...defaultNavVisibility,
+              ...(freshData.navVisibility || {}),
+            },
+          };
+          setCachedSettings(normalized);
         }
       })
       .catch((err) => {
@@ -76,8 +105,16 @@ export const getSiteSettings = async (forceFresh = false): Promise<SiteSettings>
     const snap = await getDoc(docRef);
     if (snap.exists()) {
       const freshData = snap.data() as SiteSettings;
-      setCachedSettings(freshData);
-      return freshData;
+      const normalized: SiteSettings = {
+        ...emptySettings,
+        ...freshData,
+        navVisibility: {
+          ...defaultNavVisibility,
+          ...(freshData.navVisibility || {}),
+        },
+      };
+      setCachedSettings(normalized);
+      return normalized;
     }
   } catch (err) {
     console.warn('Failed to fetch site settings from Firestore, using cache', err);

@@ -159,6 +159,18 @@ export interface Enquiry {
   honeypot?: string;
 }
 
+export interface NavigationVisibility {
+  products?: boolean;
+  industries?: boolean;
+  capabilities?: boolean;
+  projects?: boolean;
+  documents?: boolean;
+  gallery?: boolean;
+  insights?: boolean;
+  about?: boolean;
+  contact?: boolean;
+}
+
 export interface SiteSettings {
   companyName: string;
   tagline: string;
@@ -173,6 +185,7 @@ export interface SiteSettings {
   businessHours: string;
   footerDescription: string;
   copyrightText: string;
+  navVisibility?: NavigationVisibility;
 }
 
 export interface TrustMetric {
