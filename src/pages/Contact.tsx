@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { ChevronRight, Phone, Mail, MapPin, Clock, Send, ShieldCheck, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
+import { ChevronRight, Phone, Mail, MapPin, Clock, Send, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 import { submitEnquiry } from '../services/enquiries.service';
 import { getSiteSettings } from '../services/settings.service';
 import { SiteSettings } from '../types';
@@ -109,19 +109,6 @@ export const Contact: React.FC = () => {
                   <div>
                     <div className="font-bold text-white mb-0.5">Central Address</div>
                     <div className="text-gray-300 leading-relaxed">{settings.address}</div>
-                    {settings.googleMapsUrl && (
-                      <div className="mt-1.5">
-                        <a
-                          href={settings.googleMapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-[11px] font-bold text-industrial-orange hover:underline"
-                        >
-                          <span>Get Directions on Google Maps</span>
-                          <ExternalLink className="w-3 h-3 ml-1" />
-                        </a>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -151,38 +138,28 @@ export const Contact: React.FC = () => {
               </div>
             </div>
 
-            {/* Interactive Location & Google Maps Card */}
-            <div className="bg-white rounded-lg border border-industrial-border overflow-hidden shadow-subtle">
-              <div className="relative h-44 w-full bg-industrial-light">
-                <iframe
-                  title="Office & Facility Location Map"
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(settings.address || 'Infinite Hardware Technology')}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                  className="w-full h-full border-0"
-                  loading="lazy"
-                  allowFullScreen
-                ></iframe>
+            {/* Direct Engineering & Procurement Support Card */}
+            <div className="bg-white rounded-lg border border-industrial-border p-5 shadow-subtle space-y-3">
+              <div className="flex items-center space-x-2 text-industrial-dark font-bold text-xs uppercase tracking-wider border-b border-industrial-border pb-2.5">
+                <ShieldCheck className="w-4 h-4 text-industrial-orange" />
+                <span>Direct Engineering & Procurement Support</span>
               </div>
-
-              <div className="p-4 bg-industrial-light/80 border-t border-industrial-border flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="text-left min-w-0">
-                  <div className="text-xs font-bold text-industrial-dark flex items-center">
-                    <MapPin className="w-3.5 h-3.5 text-industrial-orange mr-1.5 shrink-0" />
-                    <span>Office & Logistics Hub</span>
-                  </div>
-                  <div className="text-[11px] text-industrial-muted truncate max-w-xs mt-0.5">
-                    {settings.address || 'Corporate Facility'}
-                  </div>
+              <p className="text-xs text-industrial-muted leading-relaxed">
+                Our technical sales engineers review all project drawings, load requirements, and tender specifications directly to provide competitive, compliant quotations.
+              </p>
+              <div className="pt-1 text-[11px] text-industrial-dark space-y-1.5 font-medium">
+                <div className="flex items-center space-x-2 text-emerald-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>Fast response within 2 business hours</span>
                 </div>
-
-                <a
-                  href={settings.googleMapsUrl || `https://maps.google.com/?q=${encodeURIComponent(settings.address || 'Infinite Hardware')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-industrial-orange hover:bg-industrial-orange-hover text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shrink-0 shadow-sm"
-                >
-                  <span>Open in Google Maps</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center space-x-2 text-emerald-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>IRC:83, MORTH & EN 1337 Standard Compliance</span>
+                </div>
+                <div className="flex items-center space-x-2 text-emerald-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span>Mill test certificates provided with every dispatch</span>
+                </div>
               </div>
             </div>
           </div>
