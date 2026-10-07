@@ -90,7 +90,7 @@ export interface Project {
   sortOrder: number;
 }
 
-export type GalleryCategory = 'Warehouse' | 'Products' | 'Projects' | 'Facilities' | 'Deliveries' | 'Events';
+export type GalleryCategory = 'Warehouse' | 'Products' | 'Projects' | 'Facilities' | 'Deliveries' | 'Events' | (string & {});
 
 export interface GalleryItem {
   id: string;
@@ -211,4 +211,38 @@ export interface HomepageConfig {
   finalCtaDescription: string;
   finalCtaButtonText: string;
   finalCtaButtonLink: string;
+}
+
+export interface CoreValue {
+  id: string;
+  title: string;
+  description: string;
+  icon?: string;
+}
+
+export interface LeadershipMember {
+  id: string;
+  name: string;
+  role: string;
+  bio?: string;
+  image?: string;
+  linkedin?: string;
+  sortOrder?: number;
+}
+
+export interface AboutConfig {
+  storyHeading: string;
+  storyBody: string;
+  storyImage: string;
+  highlights: string[];
+  missionTitle: string;
+  missionStatement: string;
+  visionTitle: string;
+  visionStatement: string;
+  valuesHeading: string;
+  valuesDescription?: string;
+  values: CoreValue[];
+  leadershipHeading: string;
+  leadershipDescription?: string;
+  leadershipMembers: LeadershipMember[];
 }

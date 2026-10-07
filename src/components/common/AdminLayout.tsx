@@ -16,6 +16,7 @@ import {
   Building2,
   Wrench,
   HelpCircle,
+  Info,
 } from 'lucide-react';
 import { subscribeAuth, logoutAdmin } from '../../services/auth.service';
 import { getEnquiries } from '../../services/enquiries.service';
@@ -83,6 +84,7 @@ export const AdminLayout: React.FC = () => {
     { label: 'Case Studies / Projects', path: '/admin/crud/projects', icon: Briefcase },
     { label: 'Document Library', path: '/admin/crud/documents', icon: FileText },
     { label: 'Insights Blog', path: '/admin/crud/posts', icon: BookOpen },
+    { label: 'About & Leadership', path: '/admin/crud/about', icon: Info },
     { label: 'Site Settings', path: '/admin/crud/settings', icon: Settings },
     { label: 'How To Guide', path: '/admin/guide', icon: HelpCircle },
   ];

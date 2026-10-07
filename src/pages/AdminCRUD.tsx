@@ -23,6 +23,13 @@ import {
   BookOpen,
   Info,
   Phone,
+  Target,
+  Award,
+  Users,
+  Truck,
+  Sparkles,
+  UserPlus,
+  ShieldCheck,
 } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct } from '../services/products.service';
 import { getCategories, saveCategory, deleteCategory } from '../services/categories.service';
@@ -31,12 +38,13 @@ import { getProjects, saveProject, deleteProject } from '../services/projects.se
 import { getDocuments, saveDocument, deleteDocument, getDocumentCategories, saveDocumentCategory, deleteDocumentCategory } from '../services/documents.service';
 import { getIndustries, saveIndustry, deleteIndustry } from '../services/industries.service';
 import { getCapabilities, saveCapability, deleteCapability } from '../services/capabilities.service';
-import { getGalleryItems, saveGalleryItem, deleteGalleryItem } from '../services/gallery.service';
+import { getGalleryItems, saveGalleryItem, deleteGalleryItem, getGalleryCategories, saveGalleryCategory, deleteGalleryCategory } from '../services/gallery.service';
 import { getCertifications, saveCertification, deleteCertification } from '../services/certifications.service';
 import { getPosts, savePost, deletePost } from '../services/posts.service';
 import { getSiteSettings, updateSiteSettings } from '../services/settings.service';
+import { getAboutConfig, updateAboutConfig, defaultAboutConfig } from '../services/about.service';
 import { uploadFile } from '../services/storage.service';
-import { Product, Category, Brand, Project, SiteSettings, NavigationVisibility, Industry, Capability, GalleryItem, Certification, BlogPost } from '../types';
+import { Product, Category, Brand, Project, SiteSettings, NavigationVisibility, Industry, Capability, GalleryItem, Certification, BlogPost, AboutConfig, CoreValue, LeadershipMember } from '../types';
 
 export const AdminCRUD: React.FC = () => {
   const { entity } = useParams<{ entity: string }>();
@@ -55,6 +63,11 @@ export const AdminCRUD: React.FC = () => {
   const [isCustomDocCat, setIsCustomDocCat] = useState(false);
   const [customDocCatInput, setCustomDocCatInput] = useState('');
   const [docCategories, setDocCategories] = useState<string[]>([]);
+  const [isCustomGalleryCat, setIsCustomGalleryCat] = useState(false);
+  const [customGalleryCatInput, setCustomGalleryCatInput] = useState('');
+  const [galleryCategories, setGalleryCategories] = useState<string[]>([]);
+  const [aboutConfig, setAboutConfig] = useState<AboutConfig | null>(null);
+  const [aboutSaving, setAboutSaving] = useState(false);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [categoryActionLoading, setCategoryActionLoading] = useState(false);
@@ -80,6 +93,7 @@ export const AdminCRUD: React.FC = () => {
     documents: 'documents',
     gallery: 'gallery',
     posts: 'insights',
+    about: 'about',
   };
 
   const currentNavKey = entity ? entityNavKeyMap[entity] : undefined;
@@ -143,6 +157,9 @@ export const AdminCRUD: React.FC = () => {
       const settings = await getSiteSettings(true);
       setSiteSettings(settings);
       setSettingsItem(settings);
+    } else if (entity === 'about') {
+      const abt = await getAboutConfig();
+      setAboutConfig(abt);
     } else {
       const catList = await getCategories(false);
       const brandList = await getBrands(false);
@@ -167,7 +184,10 @@ export const AdminCRUD: React.FC = () => {
       } else if (entity === 'capabilities') {
         setItems(await getCapabilities(false));
       } else if (entity === 'gallery') {
-        setItems(await getGalleryItems(false));
+        const galItems = await getGalleryItems(false);
+        const galCats = await getGalleryCategories();
+        setItems(galItems);
+        setGalleryCategories(galCats);
       } else if (entity === 'certifications') {
         setItems(await getCertifications(false));
       } else if (entity === 'posts') {
@@ -176,22 +196,40 @@ export const AdminCRUD: React.FC = () => {
     }
   };
 
+  const isDocEntity = entity === 'documents';
+  const isGalleryEntity = entity === 'gallery';
+
   const existingDocCategories = Array.from(
     new Set([
       ...docCategories,
-      ...items.map((i: any) => i.category).filter(Boolean),
+      ...(isDocEntity ? items.map((i: any) => i.category).filter(Boolean) : []),
     ])
   );
+
+  const existingGalleryCategories = Array.from(
+    new Set([
+      ...galleryCategories,
+      ...(isGalleryEntity ? items.map((i: any) => i.category).filter(Boolean) : []),
+    ])
+  );
+
+  const currentCategoryList = isGalleryEntity ? existingGalleryCategories : existingDocCategories;
 
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategoryName.trim()) return;
     try {
       setCategoryActionLoading(true);
-      const updated = await saveDocumentCategory(newCategoryName.trim());
-      setDocCategories(updated);
+      if (isGalleryEntity) {
+        const updated = await saveGalleryCategory(newCategoryName.trim());
+        setGalleryCategories(updated);
+        setMessage(`Gallery category "${newCategoryName.trim()}" created successfully.`);
+      } else {
+        const updated = await saveDocumentCategory(newCategoryName.trim());
+        setDocCategories(updated);
+        setMessage(`Document category "${newCategoryName.trim()}" created successfully.`);
+      }
       setNewCategoryName('');
-      setMessage(`Category "${newCategoryName.trim()}" created successfully.`);
       setTimeout(() => setMessage(''), 3000);
     } catch (err: any) {
       alert(`Could not create category: ${err.message || err}`);
@@ -200,25 +238,36 @@ export const AdminCRUD: React.FC = () => {
     }
   };
 
-  const handleDeleteCategory = async (catToDelete: string, docCount: number) => {
-    const remainingCats = existingDocCategories.filter((c) => c !== catToDelete);
-    const fallbackCat = remainingCats[0] || 'Catalogues';
+  const handleDeleteCategory = async (catToDelete: string, itemCount: number) => {
+    const remainingCats = currentCategoryList.filter((c) => c !== catToDelete);
+    const fallbackCat = remainingCats[0] || (isGalleryEntity ? 'Products' : 'Catalogues');
+    const itemLabel = isGalleryEntity ? 'photo(s)' : 'document(s)';
 
     const confirmMsg =
-      docCount > 0
-        ? `Are you sure you want to delete category "${catToDelete}"? ${docCount} document(s) in this category will be reassigned to "${fallbackCat}".`
+      itemCount > 0
+        ? `Are you sure you want to delete category "${catToDelete}"? ${itemCount} ${itemLabel} in this category will be reassigned to "${fallbackCat}".`
         : `Are you sure you want to delete category "${catToDelete}"?`;
 
     if (!window.confirm(confirmMsg)) return;
 
     try {
       setCategoryActionLoading(true);
-      const updated = await deleteDocumentCategory(catToDelete);
-      setDocCategories(updated);
-      const freshDocs = await getDocuments(false);
-      setItems(freshDocs);
-      if (editingItem && editingItem.category === catToDelete) {
-        setEditingItem({ ...editingItem, category: updated[0] || fallbackCat });
+      if (isGalleryEntity) {
+        const updated = await deleteGalleryCategory(catToDelete);
+        setGalleryCategories(updated);
+        const freshItems = await getGalleryItems(false);
+        setItems(freshItems);
+        if (editingItem && editingItem.category === catToDelete) {
+          setEditingItem({ ...editingItem, category: updated[0] || fallbackCat });
+        }
+      } else {
+        const updated = await deleteDocumentCategory(catToDelete);
+        setDocCategories(updated);
+        const freshDocs = await getDocuments(false);
+        setItems(freshDocs);
+        if (editingItem && editingItem.category === catToDelete) {
+          setEditingItem({ ...editingItem, category: updated[0] || fallbackCat });
+        }
       }
       setMessage(`Category "${catToDelete}" deleted successfully.`);
       setTimeout(() => setMessage(''), 3000);
@@ -267,7 +316,9 @@ export const AdminCRUD: React.FC = () => {
     } else if (entity === 'capabilities') {
       setEditingItem({ title: '', slug: '', shortDescription: '', fullContent: '', image: '', published: true, sortOrder: 1 });
     } else if (entity === 'gallery') {
-      setEditingItem({ title: '', category: 'Products', image: '', caption: '', published: true, sortOrder: 1 });
+      setIsCustomGalleryCat(false);
+      setCustomGalleryCatInput('');
+      setEditingItem({ title: '', category: existingGalleryCategories[0] || 'Products', image: '', caption: '', published: true, sortOrder: 1 });
     } else if (entity === 'certifications') {
       setEditingItem({ title: '', issuingAuthority: 'ISO', certificateNumber: '', validUntil: '', thumbnail: '', pdfUrl: '', published: true, sortOrder: 1 });
     } else if (entity === 'posts') {
@@ -320,6 +371,21 @@ export const AdminCRUD: React.FC = () => {
     setTimeout(() => setMessage(''), 3000);
   };
 
+  const handleSaveAbout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aboutConfig) return;
+    setAboutSaving(true);
+    try {
+      await updateAboutConfig(aboutConfig);
+      setMessage('About Us, Mission, Vision, Values, and Leadership updated successfully!');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err: any) {
+      alert(`Could not save About content: ${err.message || err}`);
+    } finally {
+      setAboutSaving(false);
+    }
+  };
+
   const handleDelete = async (id: string, name: string) => {
     if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
     if (entity === 'products') await deleteProduct(id);
@@ -367,11 +433,17 @@ export const AdminCRUD: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-lg border border-industrial-border shadow-subtle">
         <div>
           <h1 className="text-xl font-bold uppercase tracking-tight text-industrial-dark">
-            {entity === 'settings' ? 'Configure Website Settings' : `Manage ${entity}`}
+            {entity === 'settings'
+              ? 'Configure Website Settings'
+              : entity === 'about'
+              ? 'About Us, Mission, Values & Leadership'
+              : `Manage ${entity}`}
           </h1>
           <p className="text-xs text-industrial-muted mt-0.5">
             {entity === 'settings'
               ? 'Update contact details, office address, branding logo, and page footer options'
+              : entity === 'about'
+              ? 'Customize company story, mission statement, vision, core values, and executive leadership profiles'
               : `Create, edit, or delete listings in the ${entity} directory`}
           </p>
         </div>
@@ -406,24 +478,26 @@ export const AdminCRUD: React.FC = () => {
                 )}
               </button>
             )}
-            {entity === 'documents' && (
+            {(entity === 'documents' || entity === 'gallery') && (
               <button
                 type="button"
                 onClick={() => setShowCategoryManager(true)}
                 className="px-3.5 py-2.5 bg-industrial-slate hover:bg-industrial-dark text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shadow-sm"
-                title="Create or delete document categories"
+                title={`Create or delete ${entity === 'gallery' ? 'gallery' : 'document'} categories`}
               >
                 <FolderTree className="w-4 h-4 text-industrial-orange" />
                 <span>Manage Categories</span>
               </button>
             )}
-            <button
-              onClick={handleCreateNew}
-              className="px-4 py-2.5 bg-industrial-orange hover:bg-industrial-orange-hover text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add New Item</span>
-            </button>
+            {entity !== 'about' && (
+              <button
+                onClick={handleCreateNew}
+                className="px-4 py-2.5 bg-industrial-orange hover:bg-industrial-orange-hover text-white text-xs font-bold rounded flex items-center space-x-1.5 transition-colors shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Item</span>
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -609,8 +683,606 @@ export const AdminCRUD: React.FC = () => {
         </div>
       )}
 
+      {/* About & Leadership CMS Form */}
+      {entity === 'about' && aboutConfig && (
+        <div className="bg-white p-6 rounded-lg border border-industrial-border shadow-subtle">
+          <form onSubmit={handleSaveAbout} className="space-y-8 text-xs max-w-4xl">
+            
+            {/* Section 1: Company Story & Facility Overview */}
+            <div className="bg-gray-50 border border-industrial-border rounded-lg p-5 space-y-4">
+              <div className="border-b border-industrial-border pb-3">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-industrial-orange" />
+                  <span>1. Company Story & Facility Overview</span>
+                </h3>
+                <p className="text-[11px] text-industrial-muted mt-0.5">
+                  Introduces your engineering background, production capabilities, and facility trust markers.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                  Story Section Heading *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={aboutConfig.storyHeading || ''}
+                  onChange={(e) => setAboutConfig({ ...aboutConfig, storyHeading: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                  Story Description / Overview Body *
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  value={aboutConfig.storyBody || ''}
+                  onChange={(e) => setAboutConfig({ ...aboutConfig, storyBody: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange leading-relaxed"
+                ></textarea>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Facility Photo URL
+                  </label>
+                  <input
+                    type="text"
+                    value={aboutConfig.storyImage || ''}
+                    onChange={(e) => setAboutConfig({ ...aboutConfig, storyImage: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                    placeholder="https://..."
+                  />
+                  <div className="mt-2 flex items-center gap-2">
+                    <label className="px-3 py-1.5 bg-industrial-slate hover:bg-industrial-dark text-white rounded text-[11px] font-semibold cursor-pointer flex items-center gap-1 transition-colors">
+                      <Upload className="w-3 h-3" />
+                      <span>{uploading ? 'Uploading...' : 'Upload Facility Photo'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploading(true);
+                          try {
+                            const url = await uploadFile(file, 'about', setUploadProgress);
+                            setAboutConfig({ ...aboutConfig, storyImage: url });
+                          } catch (err: any) {
+                            alert(err.message || 'Upload failed');
+                          } finally {
+                            setUploading(false);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {aboutConfig.storyImage && (
+                  <div>
+                    <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                      Preview
+                    </label>
+                    <img
+                      src={aboutConfig.storyImage}
+                      alt="Facility preview"
+                      className="h-28 w-full object-cover rounded border border-industrial-border"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Bullet Highlights */}
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider">
+                    Quality & Compliance Highlights
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setAboutConfig({
+                        ...aboutConfig,
+                        highlights: [...(aboutConfig.highlights || []), ''],
+                      })
+                    }
+                    className="text-[11px] font-bold text-industrial-orange hover:underline flex items-center"
+                  >
+                    <Plus className="w-3 h-3 mr-0.5" />
+                    <span>Add Highlight Bullet</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {(aboutConfig.highlights || []).map((highlight, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={highlight}
+                        onChange={(e) => {
+                          const updated = [...aboutConfig.highlights];
+                          updated[idx] = e.target.value;
+                          setAboutConfig({ ...aboutConfig, highlights: updated });
+                        }}
+                        placeholder="e.g. ISO 9001:2015 Quality Management Certified"
+                        className="flex-1 px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = aboutConfig.highlights.filter((_, i) => i !== idx);
+                          setAboutConfig({ ...aboutConfig, highlights: updated });
+                        }}
+                        className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
+                        title="Remove highlight"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Mission & Vision */}
+            <div className="bg-gray-50 border border-industrial-border rounded-lg p-5 space-y-4">
+              <div className="border-b border-industrial-border pb-3">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-2">
+                  <Target className="w-4 h-4 text-industrial-orange" />
+                  <span>2. Mission & Vision Statements</span>
+                </h3>
+                <p className="text-[11px] text-industrial-muted mt-0.5">
+                  Core statements defining your company's long-term purpose and strategic aspirations.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Mission */}
+                <div className="space-y-3 bg-white p-4 rounded-lg border border-industrial-border">
+                  <div className="flex items-center gap-1.5 font-bold text-industrial-dark uppercase tracking-wider text-xs">
+                    <Target className="w-3.5 h-3.5 text-industrial-orange" />
+                    <span>Mission Box</span>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-industrial-muted mb-1">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={aboutConfig.missionTitle || 'Our Mission'}
+                      onChange={(e) => setAboutConfig({ ...aboutConfig, missionTitle: e.target.value })}
+                      className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-industrial-muted mb-1">
+                      Statement *
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      value={aboutConfig.missionStatement || ''}
+                      onChange={(e) => setAboutConfig({ ...aboutConfig, missionStatement: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange leading-relaxed"
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/* Vision */}
+                <div className="space-y-3 bg-white p-4 rounded-lg border border-industrial-border">
+                  <div className="flex items-center gap-1.5 font-bold text-industrial-dark uppercase tracking-wider text-xs">
+                    <Eye className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Vision Box</span>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-industrial-muted mb-1">
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={aboutConfig.visionTitle || 'Our Vision'}
+                      onChange={(e) => setAboutConfig({ ...aboutConfig, visionTitle: e.target.value })}
+                      className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-industrial-muted mb-1">
+                      Statement *
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      value={aboutConfig.visionStatement || ''}
+                      onChange={(e) => setAboutConfig({ ...aboutConfig, visionStatement: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange leading-relaxed"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Core Values */}
+            <div className="bg-gray-50 border border-industrial-border rounded-lg p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-industrial-border pb-3">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-industrial-orange" />
+                    <span>3. Core Values</span>
+                  </h3>
+                  <p className="text-[11px] text-industrial-muted mt-0.5">
+                    Foundational pillars of your engineering workmanship and customer commitment.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newVal: CoreValue = {
+                      id: `val-${Date.now()}`,
+                      title: 'New Value',
+                      description: 'Describe this value and how it guides your manufacturing or delivery.',
+                      icon: 'ShieldCheck',
+                    };
+                    setAboutConfig({
+                      ...aboutConfig,
+                      values: [...(aboutConfig.values || []), newVal],
+                    });
+                  }}
+                  className="px-3 py-1.5 bg-industrial-slate hover:bg-industrial-dark text-white rounded text-xs font-bold flex items-center gap-1 self-start sm:self-auto transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add New Value</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={aboutConfig.valuesHeading || 'Our Core Values'}
+                    onChange={(e) => setAboutConfig({ ...aboutConfig, valuesHeading: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Subtitle / Description (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={aboutConfig.valuesDescription || ''}
+                    onChange={(e) => setAboutConfig({ ...aboutConfig, valuesDescription: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  />
+                </div>
+              </div>
+
+              {/* Values List */}
+              <div className="space-y-3 pt-2">
+                {(aboutConfig.values || []).map((val, idx) => (
+                  <div
+                    key={val.id}
+                    className="p-4 bg-white rounded-lg border border-industrial-border shadow-xs space-y-3 relative"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-industrial-orange uppercase">
+                        Value #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = aboutConfig.values.filter((v) => v.id !== val.id);
+                          setAboutConfig({ ...aboutConfig, values: updated });
+                        }}
+                        className="p-1 text-gray-400 hover:text-red-600 rounded transition-colors"
+                        title="Delete value"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                          Value Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={val.title}
+                          onChange={(e) => {
+                            const updated = aboutConfig.values.map((v) =>
+                              v.id === val.id ? { ...v, title: e.target.value } : v
+                            );
+                            setAboutConfig({ ...aboutConfig, values: updated });
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange font-bold text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                          Icon Style
+                        </label>
+                        <select
+                          value={val.icon || 'ShieldCheck'}
+                          onChange={(e) => {
+                            const updated = aboutConfig.values.map((v) =>
+                              v.id === val.id ? { ...v, icon: e.target.value } : v
+                            );
+                            setAboutConfig({ ...aboutConfig, values: updated });
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none text-xs"
+                        >
+                          <option value="ShieldCheck">Shield (Engineering Integrity)</option>
+                          <option value="Award">Award (Certified Quality)</option>
+                          <option value="Users">Users (Customer-Centric)</option>
+                          <option value="Truck">Truck (On-Time Logistics)</option>
+                          <option value="Target">Target (Precision Focus)</option>
+                          <option value="Building2">Building (Infrastructure)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                        Description *
+                      </label>
+                      <textarea
+                        rows={2}
+                        required
+                        value={val.description}
+                        onChange={(e) => {
+                          const updated = aboutConfig.values.map((v) =>
+                            v.id === val.id ? { ...v, description: e.target.value } : v
+                          );
+                          setAboutConfig({ ...aboutConfig, values: updated });
+                        }}
+                        className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs"
+                      ></textarea>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Section 4: Executive Leadership Team */}
+            <div className="bg-gray-50 border border-industrial-border rounded-lg p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-industrial-border pb-3">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-2">
+                    <Users className="w-4 h-4 text-industrial-orange" />
+                    <span>4. Executive Leadership Team</span>
+                  </h3>
+                  <p className="text-[11px] text-industrial-muted mt-0.5">
+                    Profiles of founders, directors, and department heads driving engineering excellence.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newLead: LeadershipMember = {
+                      id: `lead-${Date.now()}`,
+                      name: '',
+                      role: '',
+                      bio: '',
+                      image: '',
+                      linkedin: '',
+                      sortOrder: (aboutConfig.leadershipMembers?.length || 0) + 1,
+                    };
+                    setAboutConfig({
+                      ...aboutConfig,
+                      leadershipMembers: [...(aboutConfig.leadershipMembers || []), newLead],
+                    });
+                  }}
+                  className="px-3 py-1.5 bg-industrial-slate hover:bg-industrial-dark text-white rounded text-xs font-bold flex items-center gap-1 self-start sm:self-auto transition-colors"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Add Leader</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={aboutConfig.leadershipHeading || 'Executive Leadership'}
+                    onChange={(e) => setAboutConfig({ ...aboutConfig, leadershipHeading: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
+                    Subtitle / Description (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={aboutConfig.leadershipDescription || ''}
+                    onChange={(e) => setAboutConfig({ ...aboutConfig, leadershipDescription: e.target.value })}
+                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                  />
+                </div>
+              </div>
+
+              {/* Members List */}
+              <div className="space-y-4 pt-2">
+                {(aboutConfig.leadershipMembers || []).map((member, idx) => (
+                  <div
+                    key={member.id}
+                    className="p-4 bg-white rounded-lg border border-industrial-border shadow-xs space-y-3"
+                  >
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                      <span className="text-[11px] font-bold text-industrial-orange uppercase">
+                        Leader #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = aboutConfig.leadershipMembers.filter((m) => m.id !== member.id);
+                          setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                        }}
+                        className="p-1 text-gray-400 hover:text-red-600 rounded transition-colors"
+                        title="Delete member"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Rajesh Sharma"
+                          value={member.name}
+                          onChange={(e) => {
+                            const updated = aboutConfig.leadershipMembers.map((m) =>
+                              m.id === member.id ? { ...m, name: e.target.value } : m
+                            );
+                            setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs font-bold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                          Role / Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Managing Director & Founder"
+                          value={member.role}
+                          onChange={(e) => {
+                            const updated = aboutConfig.leadershipMembers.map((m) =>
+                              m.id === member.id ? { ...m, role: e.target.value } : m
+                            );
+                            setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                          Photo URL (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="https://... or upload photo"
+                          value={member.image || ''}
+                          onChange={(e) => {
+                            const updated = aboutConfig.leadershipMembers.map((m) =>
+                              m.id === member.id ? { ...m, image: e.target.value } : m
+                            );
+                            setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs"
+                        />
+                        <div className="mt-1.5">
+                          <label className="inline-flex items-center px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-[10px] font-semibold cursor-pointer gap-1 transition-colors">
+                            <Upload className="w-3 h-3 text-industrial-orange" />
+                            <span>{uploading ? 'Uploading...' : 'Upload Photo'}</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setUploading(true);
+                                try {
+                                  const url = await uploadFile(file, 'leadership', setUploadProgress);
+                                  const updated = aboutConfig.leadershipMembers.map((m) =>
+                                    m.id === member.id ? { ...m, image: url } : m
+                                  );
+                                  setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                                } catch (err: any) {
+                                  alert(err.message || 'Upload failed');
+                                } finally {
+                                  setUploading(false);
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                          LinkedIn Profile Link (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="https://linkedin.com/in/..."
+                          value={member.linkedin || ''}
+                          onChange={(e) => {
+                            const updated = aboutConfig.leadershipMembers.map((m) =>
+                              m.id === member.id ? { ...m, linkedin: e.target.value } : m
+                            );
+                            setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                          }}
+                          className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-industrial-dark mb-1">
+                        Professional Bio / Summary (Optional)
+                      </label>
+                      <textarea
+                        rows={2}
+                        placeholder="Brief summary of engineering background and leadership responsibilities..."
+                        value={member.bio || ''}
+                        onChange={(e) => {
+                          const updated = aboutConfig.leadershipMembers.map((m) =>
+                            m.id === member.id ? { ...m, bio: e.target.value } : m
+                          );
+                          setAboutConfig({ ...aboutConfig, leadershipMembers: updated });
+                        }}
+                        className="w-full px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs leading-relaxed"
+                      ></textarea>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={aboutSaving}
+                className="px-6 py-2.5 bg-industrial-orange hover:bg-industrial-orange-hover disabled:opacity-50 text-white font-bold rounded flex items-center space-x-2 transition-colors uppercase tracking-wider shadow-sm"
+              >
+                <Save className="w-4 h-4" />
+                <span>{aboutSaving ? 'Saving Changes...' : 'Save About & Leadership Content'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {/* Edit / Create Form Modal */}
-      {entity !== 'settings' && editingItem && (
+      {entity !== 'settings' && entity !== 'about' && editingItem && (
         <div className="bg-white p-6 rounded-lg border border-industrial-orange shadow-elevated">
           <h2 className="text-base font-bold text-industrial-dark mb-4 border-b border-industrial-border pb-2">
             {isNew ? 'Create New Entry' : 'Edit Selected Entry'}
@@ -724,21 +1396,74 @@ export const AdminCRUD: React.FC = () => {
             {entity === 'gallery' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                    Gallery Category *
-                  </label>
-                  <select
-                    value={editingItem.category || 'Products'}
-                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none"
-                  >
-                    <option value="Products">Products</option>
-                    <option value="Projects">Projects</option>
-                    <option value="Facilities">Facilities</option>
-                    <option value="Warehouse">Warehouse</option>
-                    <option value="Deliveries">Deliveries</option>
-                    <option value="Events">Events</option>
-                  </select>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-bold text-industrial-dark uppercase tracking-wider">
+                      Gallery Category *
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowCategoryManager(true)}
+                        className="text-[11px] text-gray-500 hover:text-industrial-dark hover:underline font-semibold flex items-center"
+                        title="Add or delete categories"
+                      >
+                        <FolderTree className="w-3 h-3 mr-0.5 text-industrial-orange" />
+                        Manage List
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !isCustomGalleryCat;
+                          setIsCustomGalleryCat(next);
+                          if (next) {
+                            setCustomGalleryCatInput('');
+                            setEditingItem({ ...editingItem, category: '' });
+                          } else {
+                            setEditingItem({ ...editingItem, category: existingGalleryCategories[0] || 'Products' });
+                          }
+                        }}
+                        className="text-[11px] text-industrial-orange hover:underline font-bold"
+                      >
+                        {isCustomGalleryCat ? '← Pick from list' : '+ Type New'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {isCustomGalleryCat ? (
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Field Inspection, CNC Plant..."
+                      value={customGalleryCatInput}
+                      onChange={(e) => {
+                        setCustomGalleryCatInput(e.target.value);
+                        setEditingItem({ ...editingItem, category: e.target.value });
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-industrial-orange rounded focus:outline-none"
+                    />
+                  ) : (
+                    <select
+                      value={editingItem.category || 'Products'}
+                      onChange={(e) => {
+                        if (e.target.value === '__NEW__') {
+                          setIsCustomGalleryCat(true);
+                          setCustomGalleryCatInput('');
+                          setEditingItem({ ...editingItem, category: '' });
+                        } else {
+                          setEditingItem({ ...editingItem, category: e.target.value });
+                        }
+                      }}
+                      className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange"
+                    >
+                      {existingGalleryCategories.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__NEW__">+ Type a new category...</option>
+                    </select>
+                  )}
                 </div>
                 <div>
                   <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
@@ -1153,7 +1878,7 @@ export const AdminCRUD: React.FC = () => {
       )}
 
       {/* Existing Items Table */}
-      {!editingItem && entity !== 'settings' && (
+      {!editingItem && entity !== 'settings' && entity !== 'about' && (
         <div className="bg-white rounded-lg border border-industrial-border shadow-subtle p-6">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
@@ -1278,7 +2003,7 @@ export const AdminCRUD: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <FolderTree className="w-5 h-5 text-industrial-orange" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark">
-                  Manage Document Categories
+                  Manage {isGalleryEntity ? 'Gallery' : 'Document'} Categories
                 </h3>
               </div>
               <button
@@ -1299,7 +2024,11 @@ export const AdminCRUD: React.FC = () => {
               <form onSubmit={handleCreateCategory} className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="e.g. Safety Standards, Test Reports..."
+                  placeholder={
+                    isGalleryEntity
+                      ? 'e.g. Factory Tours, Proof Load Testing...'
+                      : 'e.g. Safety Standards, Test Reports...'
+                  }
                   value={newCategoryName}
                   onChange={(e) => setNewCategoryName(e.target.value)}
                   className="flex-1 px-3 py-2 bg-white border border-industrial-border rounded text-xs focus:outline-none focus:border-industrial-orange"
@@ -1319,11 +2048,15 @@ export const AdminCRUD: React.FC = () => {
             {/* List of existing categories with delete action */}
             <div>
               <label className="block text-[11px] font-bold uppercase text-industrial-dark mb-2">
-                Existing Categories ({existingDocCategories.length})
+                Existing Categories ({currentCategoryList.length})
               </label>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1 divide-y divide-gray-100">
-                {existingDocCategories.map((cat) => {
-                  const docCount = items.filter((d) => d.category === cat).length;
+                {currentCategoryList.map((cat) => {
+                  const itemCount = items.filter((d) => d.category === cat).length;
+                  const countLabel = isGalleryEntity
+                    ? itemCount === 1 ? 'photo' : 'photos'
+                    : itemCount === 1 ? 'doc' : 'docs';
+
                   return (
                     <div
                       key={cat}
@@ -1332,17 +2065,17 @@ export const AdminCRUD: React.FC = () => {
                       <div className="flex items-center space-x-2 min-w-0">
                         <span className="font-bold text-industrial-dark truncate">{cat}</span>
                         <span className="text-[10px] text-gray-500 font-medium px-2 py-0.5 rounded-full bg-white border border-gray-200 shrink-0">
-                          {docCount} {docCount === 1 ? 'doc' : 'docs'}
+                          {itemCount} {countLabel}
                         </span>
                       </div>
 
                       <button
                         type="button"
-                        disabled={categoryActionLoading || existingDocCategories.length <= 1}
-                        onClick={() => handleDeleteCategory(cat, docCount)}
+                        disabled={categoryActionLoading || currentCategoryList.length <= 1}
+                        onClick={() => handleDeleteCategory(cat, itemCount)}
                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
                         title={
-                          existingDocCategories.length <= 1
+                          currentCategoryList.length <= 1
                             ? 'Cannot delete the only remaining category'
                             : `Delete "${cat}"`
                         }

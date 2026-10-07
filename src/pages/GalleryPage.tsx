@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Image as ImageIcon, X } from 'lucide-react';
-import { getGalleryItems } from '../services/gallery.service';
+import { getGalleryItems, getGalleryCategories } from '../services/gallery.service';
 import { GalleryItem, GalleryCategory } from '../types';
 
 export const GalleryPage: React.FC = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
+  const [galleryCategories, setGalleryCategories] = useState<string[]>([]);
   const [selectedCat, setSelectedCat] = useState<string>('All');
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);
 
   useEffect(() => {
-    getGalleryItems().then(setItems);
+    Promise.all([getGalleryItems(), getGalleryCategories()]).then(([itemList, catList]) => {
+      setItems(itemList);
+      setGalleryCategories(catList);
+    });
   }, []);
 
-  const categories = ['All', 'Warehouse', 'Products', 'Projects', 'Facilities', 'Deliveries'];
+  const categories = ['All', ...galleryCategories];
   const filtered = selectedCat === 'All' ? items : items.filter(i => i.category === selectedCat);
 
   return (
