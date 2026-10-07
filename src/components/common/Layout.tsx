@@ -3,7 +3,10 @@ import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { SearchModal } from './SearchModal';
-import { getSiteSettings } from '../../services/settings.service';
+import {
+  subscribeToSiteSettings,
+  getCachedSettings,
+} from '../../services/settings.service';
 import { configStatus, USE_DEMO_DATA } from '../../lib/firebase';
 import { NavigationVisibility, SiteSettings } from '../../types';
 import { AlertTriangle } from 'lucide-react';
@@ -23,30 +26,18 @@ const isPathHidden = (pathname: string, nav: NavigationVisibility = {}) => {
   return false;
 };
 
-const emptySettings: SiteSettings = {
-  companyName: 'Infinite Hardware Technology (P) Ltd.',
-  tagline: 'Bridge Bearings • Expansion Joints • Couplings',
-  logoUrl: '/logo.jpg',
-  phone: '',
-  altPhone: '',
-  email: '',
-  whatsapp: '',
-  address: '',
-  businessHours: '',
-  googleMapsUrl: '',
-  footerDescription: '',
-  copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
-};
-
 export const Layout: React.FC = () => {
-  const [settings, setSettings] = useState<SiteSettings>(emptySettings);
+  const [settings, setSettings] = useState<SiteSettings>(getCachedSettings());
   const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    getSiteSettings().then(setSettings).catch((err) => {
-      console.warn('Using default site settings:', err);
+    const unsubscribe = subscribeToSiteSettings((latest) => {
+      setSettings(latest);
     });
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   if (isPathHidden(location.pathname, settings.navVisibility)) {

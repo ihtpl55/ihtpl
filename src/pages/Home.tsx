@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import {
   ArrowRight,
   ShieldCheck,
@@ -15,8 +15,7 @@ import { getProducts } from '../services/products.service';
 import { getIndustries } from '../services/industries.service';
 import { getCapabilities } from '../services/capabilities.service';
 import { getProjects } from '../services/projects.service';
-import { getPosts } from '../services/posts.service';
-import { getSiteSettings } from '../services/settings.service';
+import { getSiteSettings, getCachedSettings } from '../services/settings.service';
 import {
   HomepageConfig,
   Category,
@@ -24,7 +23,6 @@ import {
   Industry,
   Capability,
   Project,
-  BlogPost,
   SiteSettings,
 } from '../types';
 const defaultHomepageConfig: HomepageConfig = {
@@ -52,45 +50,48 @@ const defaultHomepageConfig: HomepageConfig = {
 };
 
 export const Home: React.FC = () => {
+  const outlet = useOutletContext<{ settings?: SiteSettings }>();
   const [config, setConfig] = useState<HomepageConfig>(defaultHomepageConfig);
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [capabilities, setCapabilities] = useState<Capability[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [settings, setSettings] = useState<SiteSettings>(
+    outlet?.settings || getCachedSettings()
+  );
   const [loading, setLoading] = useState(true);
 
+  // Synchronize live whenever Layout settings change
   useEffect(() => {
-    Promise.all([
+    if (outlet?.settings) {
+      setSettings(outlet.settings);
+    }
+  }, [outlet?.settings]);
+
+  useEffect(() => {
+    Promise.allSettled([
       getHomepageConfig(),
       getCategories(),
       getProducts(),
       getIndustries(),
       getCapabilities(),
       getProjects(),
-      getPosts(),
-      getSiteSettings(),
-    ])
-      .then(([cfg, cats, prods, inds, caps, projs, pstList, siteSet]) => {
-        setConfig(cfg);
-        setCategories(cats.slice(0, 8));
-        setFeaturedProducts(prods.filter((p) => p.featured).slice(0, 6));
-        setIndustries(inds.slice(0, 6));
-        setCapabilities(caps.slice(0, 4));
-        setProjects(projs.slice(0, 3));
-        setPosts(pstList.slice(0, 3));
-        setSettings(siteSet);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.warn('Using default data:', err);
-        setLoading(false);
-      });
+      getSiteSettings(true),
+    ]).then(([cfgRes, catsRes, prodsRes, indsRes, capsRes, projsRes, siteSetRes]) => {
+      if (cfgRes.status === 'fulfilled') setConfig(cfgRes.value);
+      if (catsRes.status === 'fulfilled') setCategories(catsRes.value.slice(0, 8));
+      if (prodsRes.status === 'fulfilled') setFeaturedProducts(prodsRes.value.filter((p) => p.featured).slice(0, 6));
+      if (indsRes.status === 'fulfilled') setIndustries(indsRes.value.slice(0, 6));
+      if (capsRes.status === 'fulfilled') setCapabilities(capsRes.value.slice(0, 4));
+      if (projsRes.status === 'fulfilled') setProjects(projsRes.value.slice(0, 3));
+      if (siteSetRes.status === 'fulfilled') setSettings(siteSetRes.value);
+      setLoading(false);
+    });
   }, []);
 
-  const nav = settings?.navVisibility || {};
+  const effectiveSettings = outlet?.settings || settings;
+  const nav = effectiveSettings?.navVisibility || {};
   const showProducts = nav.products !== false;
   const showIndustries = nav.industries !== false;
   const showCapabilities = nav.capabilities !== false;
