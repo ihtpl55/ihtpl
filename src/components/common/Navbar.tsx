@@ -178,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
                 to="/about"
                 className={`whitespace-nowrap transition-colors ${isActive('/about') ? 'text-industrial-orange font-bold' : 'text-industrial-dark hover:text-industrial-orange'}`}
               >
-                About
+                About Us
               </Link>
             )}
 
