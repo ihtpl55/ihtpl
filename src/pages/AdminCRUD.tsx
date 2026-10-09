@@ -332,11 +332,15 @@ export const AdminCRUD: React.FC = () => {
 
     if (entity === 'products') {
       const selectedCat = categories.find(c => c.id === editingItem.categoryId);
+      const cleanSpecs = (editingItem.specifications || []).filter(
+        (s: { key?: string; value?: string }) => s && (s.key?.trim() || s.value?.trim())
+      );
       const updatedItem = {
         ...editingItem,
         categoryName: selectedCat ? selectedCat.name : editingItem.categoryName,
         brandId: '',
         brandName: 'Infinite Hardware',
+        specifications: cleanSpecs,
       };
       await saveProduct(updatedItem);
     } else if (entity === 'categories') {
@@ -1801,10 +1805,10 @@ export const AdminCRUD: React.FC = () => {
             {(editingItem.shortDescription !== undefined || editingItem.summary !== undefined) && entity !== 'projects' && (
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                  Brief Summary <span className="text-[10px] text-gray-500 font-normal lowercase">(1-2 sentences for list view)</span>
+                  Brief Summary <span className="text-[10px] text-gray-500 font-normal lowercase">(supports Markdown bullet lists - , bold **, line breaks)</span>
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={editingItem.shortDescription !== undefined ? editingItem.shortDescription : editingItem.summary}
                   onChange={(e) => setEditingItem(
                     editingItem.shortDescription !== undefined
@@ -1820,7 +1824,7 @@ export const AdminCRUD: React.FC = () => {
             {(editingItem.description !== undefined || editingItem.fullContent !== undefined || editingItem.content !== undefined) && entity !== 'projects' && (
               <div>
                 <label className="block font-bold text-industrial-dark uppercase tracking-wider mb-1">
-                  Detailed Description / Article Body
+                  Detailed Description / Article Body <span className="text-[10px] text-gray-500 font-normal lowercase">(supports Markdown: ## headings, - bullets, **bold**, tables)</span>
                 </label>
                 <textarea
                   rows={8}
@@ -1832,6 +1836,87 @@ export const AdminCRUD: React.FC = () => {
                   )}
                   className="w-full px-3 py-2 bg-white border border-industrial-border rounded focus:outline-none font-mono text-xs"
                 ></textarea>
+              </div>
+            )}
+
+            {/* Product Specifications Manager */}
+            {entity === 'products' && (
+              <div className="bg-gray-50 border border-industrial-border rounded-lg p-4 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-industrial-border pb-2 gap-2">
+                  <div>
+                    <label className="block font-bold text-industrial-dark uppercase tracking-wider text-xs">
+                      Product Specifications
+                    </label>
+                    <p className="text-[11px] text-gray-500">
+                      These parameters populate the <strong>"Key Specifications"</strong> box and the <strong>"Technical Specifications Table"</strong>. Delete all rows to hide specification tables for this product.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentSpecs = Array.isArray(editingItem.specifications) ? editingItem.specifications : [];
+                      setEditingItem({
+                        ...editingItem,
+                        specifications: [...currentSpecs, { key: '', value: '' }],
+                      });
+                    }}
+                    className="px-3 py-1.5 bg-industrial-orange hover:bg-industrial-orange-hover text-white rounded text-xs font-bold flex items-center shrink-0 self-start sm:self-auto transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" />
+                    <span>Add Parameter</span>
+                  </button>
+                </div>
+
+                {(!editingItem.specifications || editingItem.specifications.length === 0) ? (
+                  <div className="text-center py-4 text-gray-400 text-xs italic bg-white rounded border border-dashed border-gray-200">
+                    No specifications configured. Click "+ Add Parameter" to add specifications, or leave blank to hide the specifications table on the product page.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="hidden sm:grid grid-cols-12 gap-2 text-[10px] font-bold uppercase text-gray-500 px-1">
+                      <div className="col-span-5">Parameter Name</div>
+                      <div className="col-span-6">Specification Value</div>
+                      <div className="col-span-1 text-right">Action</div>
+                    </div>
+                    {editingItem.specifications.map((spec: { key: string; value: string }, idx: number) => (
+                      <div key={idx} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-white p-2 sm:p-0 rounded sm:bg-transparent border sm:border-0 border-gray-200">
+                        <input
+                          type="text"
+                          placeholder="e.g. Material, Load Capacity, Standard"
+                          value={spec.key || ''}
+                          onChange={(e) => {
+                            const updated = [...editingItem.specifications];
+                            updated[idx] = { ...updated[idx], key: e.target.value };
+                            setEditingItem({ ...editingItem, specifications: updated });
+                          }}
+                          className="w-full sm:w-5/12 px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs font-semibold"
+                        />
+                        <input
+                          type="text"
+                          placeholder="e.g. High Tensile Steel, 5000 kN, IRC:83"
+                          value={spec.value || ''}
+                          onChange={(e) => {
+                            const updated = [...editingItem.specifications];
+                            updated[idx] = { ...updated[idx], value: e.target.value };
+                            setEditingItem({ ...editingItem, specifications: updated });
+                          }}
+                          className="w-full sm:flex-1 px-3 py-1.5 bg-white border border-industrial-border rounded focus:outline-none focus:border-industrial-orange text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = editingItem.specifications.filter((_: any, i: number) => i !== idx);
+                            setEditingItem({ ...editingItem, specifications: updated });
+                          }}
+                          className="self-end sm:self-auto p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
+                          title="Delete specification parameter"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

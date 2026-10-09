@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, FileText, Download, ShieldCheck, ArrowRight, Package, Mail } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { getProductBySlug, getProducts } from '../services/products.service';
 import { Product } from '../types';
 import { ProductDetailSkeleton } from '../components/common/Skeleton';
+
+const normalizeMarkdown = (content?: string): string => {
+  if (!content) return '';
+  return content
+    // Normalize unicode bullet characters at line start
+    .replace(/^[ \t]*[•●▪◦][ \t]*/gm, '- ')
+    // Normalize inline bullet characters after punctuation into newlines with bullets
+    .replace(/([.!?])\s+[•●▪◦]\s+/g, '$1\n\n- ')
+    // Normalize inline hyphen bullets after sentence end into newlines
+    .replace(/([.!?])\s+-\s+([A-Z0-9])/g, '$1\n\n- $2')
+    // Ensure hyphens without space at line starts get space
+    .replace(/^-([A-Za-z0-9])/gm, '- $1');
+};
 
 export const ProductDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -51,6 +67,9 @@ export const ProductDetail: React.FC = () => {
   }
 
   const allImages = [product.featuredImage, ...(product.galleryImages || [])].filter(Boolean);
+  const validSpecs = (product.specifications || []).filter(
+    (s) => s && (s.key?.trim() || s.value?.trim())
+  );
 
   return (
     <div className="bg-white min-h-screen py-10">
@@ -99,17 +118,28 @@ export const ProductDetail: React.FC = () => {
               <h1 className="text-2xl sm:text-3xl font-black text-industrial-dark tracking-tight leading-tight mb-3">
                 {product.name}
               </h1>
-              <p className="text-sm text-industrial-muted leading-relaxed">
-                {product.shortDescription}
-              </p>
+              <div className="text-sm text-industrial-muted leading-relaxed">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkBreaks]}
+                  components={{
+                    p: ({ node, ...props }) => <p className="mb-2 text-industrial-muted leading-relaxed" {...props} />,
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 my-2 space-y-1.5 text-industrial-muted" {...props} />,
+                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 my-2 space-y-1.5 text-industrial-muted" {...props} />,
+                    li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
+                    strong: ({ node, ...props }) => <strong className="font-bold text-industrial-dark" {...props} />,
+                  }}
+                >
+                  {normalizeMarkdown(product.shortDescription)}
+                </ReactMarkdown>
+              </div>
             </div>
 
             {/* Quick Specs Snippet */}
-            {product.specifications.length > 0 && (
+            {validSpecs.length > 0 && (
               <div className="bg-industrial-light p-4 rounded-lg border border-industrial-border space-y-2">
                 <div className="text-xs font-bold uppercase text-industrial-dark tracking-wider mb-2">Key Specifications</div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  {product.specifications.slice(0, 4).map((s, idx) => (
+                  {validSpecs.slice(0, 4).map((s, idx) => (
                     <div key={idx} className="bg-white p-2 rounded border border-industrial-border">
                       <div className="text-[10px] text-industrial-muted font-medium">{s.key}</div>
                       <div className="font-bold text-industrial-dark truncate">{s.value}</div>
@@ -151,13 +181,39 @@ export const ProductDetail: React.FC = () => {
           {/* Full Description */}
           <div>
             <h2 className="text-xl font-bold text-industrial-dark mb-4">Product Overview</h2>
-            <div className="prose max-w-none text-sm text-industrial-dark leading-relaxed">
-              <p>{product.description}</p>
+            <div className="text-sm text-industrial-dark leading-relaxed">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={{
+                  h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-industrial-dark mt-6 mb-3" {...props} />,
+                  h2: ({ node, ...props }) => <h2 className="text-xl font-bold text-industrial-dark mt-5 mb-2.5" {...props} />,
+                  h3: ({ node, ...props }) => <h3 className="text-lg font-bold text-industrial-dark mt-4 mb-2" {...props} />,
+                  h4: ({ node, ...props }) => <h4 className="text-base font-bold text-industrial-dark mt-3 mb-1.5" {...props} />,
+                  p: ({ node, ...props }) => <p className="mb-3 leading-relaxed text-industrial-dark" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-4 space-y-1.5 text-industrial-dark" {...props} />,
+                  ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-4 space-y-1.5 text-industrial-dark" {...props} />,
+                  li: ({ node, ...props }) => <li className="leading-relaxed text-industrial-dark" {...props} />,
+                  strong: ({ node, ...props }) => <strong className="font-bold text-industrial-dark" {...props} />,
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote className="border-l-4 border-industrial-orange pl-4 italic my-3 text-industrial-muted" {...props} />
+                  ),
+                  table: ({ node, ...props }) => (
+                    <div className="overflow-x-auto border border-industrial-border rounded-lg my-4">
+                      <table className="w-full text-left text-xs" {...props} />
+                    </div>
+                  ),
+                  thead: ({ node, ...props }) => <thead className="bg-industrial-dark text-white uppercase font-bold text-[11px]" {...props} />,
+                  th: ({ node, ...props }) => <th className="py-2.5 px-4" {...props} />,
+                  td: ({ node, ...props }) => <td className="py-2.5 px-4 border-t border-industrial-border" {...props} />,
+                }}
+              >
+                {normalizeMarkdown(product.description)}
+              </ReactMarkdown>
             </div>
           </div>
 
           {/* Complete Specification Table */}
-          {product.specifications.length > 0 && (
+          {validSpecs.length > 0 && (
             <div>
               <h2 className="text-xl font-bold text-industrial-dark mb-4">Technical Specifications Table</h2>
               <div className="overflow-x-auto border border-industrial-border rounded-lg">
@@ -169,7 +225,7 @@ export const ProductDetail: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-industrial-border">
-                    {product.specifications.map((spec, idx) => (
+                    {validSpecs.map((spec, idx) => (
                       <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-industrial-light'}>
                         <td className="py-3 px-4 font-bold text-industrial-dark">{spec.key}</td>
                         <td className="py-3 px-4 text-industrial-muted">{spec.value}</td>

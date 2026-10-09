@@ -8,6 +8,16 @@ import { ProductCardSkeleton } from '../components/common/Skeleton';
 
 const ITEMS_PER_PAGE = 9;
 
+const stripMarkdown = (text?: string): string => {
+  if (!text) return '';
+  return text
+    .replace(/^[ \t]*[-*•●]\s*/gm, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_~`#]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 export const Products: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
@@ -268,7 +278,7 @@ export const Products: React.FC = () => {
                           {prod.name}
                         </h3>
                         <p className="text-xs text-industrial-muted line-clamp-2 leading-relaxed mb-3">
-                          {prod.shortDescription}
+                          {stripMarkdown(prod.shortDescription)}
                         </p>
                       </div>
 
@@ -318,12 +328,12 @@ export const Products: React.FC = () => {
                         {prod.name}
                       </h3>
                       <p className="text-xs text-industrial-muted line-clamp-2 mb-3 leading-relaxed">
-                        {prod.shortDescription}
+                        {stripMarkdown(prod.shortDescription)}
                       </p>
 
-                      {prod.specifications.length > 0 && (
+                      {((prod.specifications || []).filter(s => s && (s.key?.trim() || s.value?.trim()))).length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {prod.specifications.slice(0, 3).map((s, i) => (
+                          {prod.specifications.filter(s => s && (s.key?.trim() || s.value?.trim())).slice(0, 3).map((s, i) => (
                             <span key={i} className="text-[11px] bg-industrial-light px-2 py-0.5 rounded text-industrial-dark font-medium border border-industrial-border">
                               {s.key}: <strong className="font-semibold">{s.value}</strong>
                             </span>
