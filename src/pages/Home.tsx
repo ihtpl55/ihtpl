@@ -16,8 +16,10 @@ import { getIndustries } from '../services/industries.service';
 import { getCapabilities } from '../services/capabilities.service';
 import { getProjects } from '../services/projects.service';
 import { getSiteSettings, getCachedSettings } from '../services/settings.service';
+import { getAboutConfig, defaultAboutConfig } from '../services/about.service';
 import {
   HomepageConfig,
+  AboutConfig,
   Category,
   Product,
   Industry,
@@ -52,6 +54,7 @@ const defaultHomepageConfig: HomepageConfig = {
 export const Home: React.FC = () => {
   const outlet = useOutletContext<{ settings?: SiteSettings }>();
   const [config, setConfig] = useState<HomepageConfig>(defaultHomepageConfig);
+  const [aboutConfig, setAboutConfig] = useState<AboutConfig>(defaultAboutConfig);
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -78,7 +81,8 @@ export const Home: React.FC = () => {
       getCapabilities(),
       getProjects(),
       getSiteSettings(true),
-    ]).then(([cfgRes, catsRes, prodsRes, indsRes, capsRes, projsRes, siteSetRes]) => {
+      getAboutConfig(),
+    ]).then(([cfgRes, catsRes, prodsRes, indsRes, capsRes, projsRes, siteSetRes, abtRes]) => {
       if (cfgRes.status === 'fulfilled') setConfig(cfgRes.value);
       if (catsRes.status === 'fulfilled') setCategories(catsRes.value.slice(0, 8));
       if (prodsRes.status === 'fulfilled') setFeaturedProducts(prodsRes.value.filter((p) => p.featured).slice(0, 6));
@@ -86,6 +90,7 @@ export const Home: React.FC = () => {
       if (capsRes.status === 'fulfilled') setCapabilities(capsRes.value.slice(0, 4));
       if (projsRes.status === 'fulfilled') setProjects(projsRes.value.slice(0, 3));
       if (siteSetRes.status === 'fulfilled') setSettings(siteSetRes.value);
+      if (abtRes.status === 'fulfilled') setAboutConfig(abtRes.value);
       setLoading(false);
     });
   }, []);
@@ -220,32 +225,24 @@ export const Home: React.FC = () => {
                   COMPANY OVERVIEW
                 </div>
                 <h2 className="text-2xl sm:text-4xl font-black text-industrial-dark tracking-tight leading-tight">
-                  {config.companyHeading}
+                  {aboutConfig.storyHeading || config.companyHeading}
                 </h2>
-                <p className="text-sm sm:text-base text-industrial-muted leading-relaxed">
-                  {config.companyBody}
+                <p className="text-sm sm:text-base text-industrial-muted leading-relaxed whitespace-pre-line">
+                  {aboutConfig.storyBody || config.companyBody}
                 </p>
 
-                <div className="space-y-2.5 pt-2">
-                  <div className="flex items-start">
-                    <CheckCircle2 className="w-5 h-5 text-industrial-orange mr-3 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm font-semibold text-industrial-dark">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    </span>
+                {aboutConfig.highlights && aboutConfig.highlights.length > 0 && (
+                  <div className="space-y-2.5 pt-2">
+                    {aboutConfig.highlights.map((highlight, idx) => (
+                      <div key={idx} className="flex items-start">
+                        <CheckCircle2 className="w-5 h-5 text-industrial-orange mr-3 shrink-0 mt-0.5" />
+                        <span className="text-xs sm:text-sm font-semibold text-industrial-dark">
+                          {highlight}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-start">
-                    <CheckCircle2 className="w-5 h-5 text-industrial-orange mr-3 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm font-semibold text-industrial-dark">
-                      Sed do eiusmod tempor incididunt ut labore et dolore.
-                    </span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle2 className="w-5 h-5 text-industrial-orange mr-3 shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm font-semibold text-industrial-dark">
-                      Ut enim ad minim veniam, quis nostrud exercitation.
-                    </span>
-                  </div>
-                </div>
+                )}
 
                 <div className="pt-2 sm:pt-4">
                   <Link
@@ -259,12 +256,19 @@ export const Home: React.FC = () => {
               </div>
 
               <div className="lg:col-span-6">
-                <div className="relative rounded-lg overflow-hidden border border-industrial-border shadow-subtle">
+                <div className="relative rounded-lg overflow-hidden border border-industrial-border shadow-elevated group">
                   <img
-                    src={config.companyImage}
+                    src={aboutConfig.storyImage || config.companyImage || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80'}
                     alt="Company Facility"
-                    className="w-full h-auto object-cover"
+                    className="w-full h-80 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/60 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-industrial-orange px-2 py-0.5 rounded">
+                      Certified Facility
+                    </span>
+                    <p className="text-xs font-semibold mt-1">High-Precision Manufacturing & Load-Testing Plant</p>
+                  </div>
                 </div>
               </div>
             </div>
