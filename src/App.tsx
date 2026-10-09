@@ -52,6 +52,7 @@ export const App: React.FC = () => {
           <Route path="infrastructure" element={<Infrastructure />} />
           <Route path="quality" element={<Quality />} />
           <Route path="resources/documents" element={<DocumentCenter />} />
+          <Route path="documents" element={<DocumentCenter />} />
           <Route path="gallery" element={<GalleryPage />} />
           <Route path="insights" element={<InsightsPage />} />
           <Route path="insights/:slug" element={<InsightDetail />} />

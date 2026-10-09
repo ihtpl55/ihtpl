@@ -437,6 +437,12 @@ export const AdminCRUD: React.FC = () => {
               ? 'Configure Website Settings'
               : entity === 'about'
               ? 'About Us, Mission, Values & Leadership'
+              : entity === 'documents'
+              ? 'Document Center Management'
+              : entity === 'gallery'
+              ? 'Media Gallery Management'
+              : entity === 'posts'
+              ? 'Industry Insights & Articles'
               : `Manage ${entity}`}
           </h1>
           <p className="text-xs text-industrial-muted mt-0.5">
@@ -444,6 +450,12 @@ export const AdminCRUD: React.FC = () => {
               ? 'Update contact details, office address, branding logo, and page footer options'
               : entity === 'about'
               ? 'Customize company story, mission statement, vision, core values, and executive leadership profiles'
+              : entity === 'documents'
+              ? 'Upload, organize categories, and manage technical catalogues, approvals, and certifications'
+              : entity === 'gallery'
+              ? 'Upload, categorize, and organize factory, testing rig, and project photos'
+              : entity === 'posts'
+              ? 'Publish and manage engineering articles and technical insights'
               : `Create, edit, or delete listings in the ${entity} directory`}
           </p>
         </div>
