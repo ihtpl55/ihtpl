@@ -188,11 +188,6 @@ export const Home: React.FC = () => {
                       alt={cat.name}
                       className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
-                    {cat.productCount && (
-                      <span className="absolute top-3 right-3 bg-industrial-dark/90 text-white text-[11px] font-bold px-2.5 py-1 rounded shadow">
-                        {cat.productCount}+ Items
-                      </span>
-                    )}
                   </div>
                   <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
                     <div>
