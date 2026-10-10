@@ -77,7 +77,7 @@ export const About: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
           <div className="lg:col-span-6 space-y-4">
             <div className="text-[11px] font-bold uppercase tracking-wider text-industrial-orange">
-              Manufacturing Heritage & Integrity
+              Precision Made in India
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-industrial-dark tracking-tight">
               {aboutConfig.storyHeading}
