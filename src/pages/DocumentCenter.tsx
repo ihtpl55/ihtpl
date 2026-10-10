@@ -35,12 +35,9 @@ export const DocumentCenter: React.FC = () => {
         </div>
 
         <div className="border-b border-industrial-border pb-8 mb-8">
-          <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight mb-3">
-            Document & Technical Approval Center
+          <h1 className="text-3xl sm:text-4xl font-black text-industrial-dark tracking-tight">
+            Document Center
           </h1>
-          <p className="text-sm text-industrial-muted max-w-3xl leading-relaxed">
-            Access ISO quality management certificates, master product catalogues, vendor approvals, and fastener specification sheets.
-          </p>
         </div>
 
         {/* Filter Bar */}
