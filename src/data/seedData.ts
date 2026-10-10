@@ -30,9 +30,9 @@ export const initialSiteSettings: SiteSettings = {
 };
 
 export const initialHomepageConfig: HomepageConfig = {
-  heroEyebrow: 'HARDWARE & INDUSTRIAL SUPPLIES',
-  heroHeading: 'Bridge Bearings, Expansion Joints & Hardware',
-  heroDescription: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+  heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
+  heroHeading: 'Leading manufacturers of Bridge Bearing and HSFG Bolts',
+  heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85',
   primaryCtaText: 'View Products',
   primaryCtaLink: '/products',

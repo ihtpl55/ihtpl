@@ -28,9 +28,9 @@ import {
   SiteSettings,
 } from '../types';
 const defaultHomepageConfig: HomepageConfig = {
-  heroEyebrow: 'ENGINEERED HEAVY INFRASTRUCTURE',
-  heroHeading: 'Precision Bridge Bearings & Expansion Joints',
-  heroDescription: 'Infinite Hardware Technology (P) Ltd. manufactures and delivers heavy-duty bridge bearings, expansion joints, structural couplings, and infrastructure solutions built for mission-critical reliability.',
+  heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
+  heroHeading: 'Leading manufacturers of Bridge Bearing and HSFG Bolts',
+  heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: '/logo.jpg',
   primaryCtaText: 'Explore Product Catalog',
   primaryCtaLink: '/products',
@@ -283,7 +283,7 @@ export const Home: React.FC = () => {
                 Our Capabilities
               </h2>
               <p className="text-xs sm:text-sm text-industrial-muted mt-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Precision engineering, manufacturing, and testing capabilities delivering structural reliability.
               </p>
             </div>
 

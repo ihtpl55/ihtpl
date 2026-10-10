@@ -1,11 +1,11 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db, USE_DEMO_DATA } from '../lib/firebase';
+import { db, USE_DEMO_DATA, auth } from '../lib/firebase';
 import { HomepageConfig } from '../types';
 
 const defaultHomepageConfig: HomepageConfig = {
-  heroEyebrow: 'ENGINEERED HEAVY INFRASTRUCTURE',
-  heroHeading: 'Precision Bridge Bearings & Expansion Joints',
-  heroDescription: 'Infinite Hardware Technology (P) Ltd. manufactures and delivers heavy-duty bridge bearings, expansion joints, structural couplings, and infrastructure solutions built for mission-critical reliability.',
+  heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
+  heroHeading: 'Leading manufacturers of Bridge Bearing and HSFG Bolts',
+  heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: '/logo.jpg',
   primaryCtaText: 'Explore Product Catalog',
   primaryCtaLink: '/products',
@@ -38,7 +38,37 @@ export const getHomepageConfig = async (): Promise<HomepageConfig> => {
   const docRef = doc(db, 'homepage', 'main');
   const snap = await getDoc(docRef);
   if (snap.exists()) {
-    return snap.data() as HomepageConfig;
+    const data = snap.data() as HomepageConfig;
+    const sanitized: HomepageConfig = {
+      ...data,
+      heroEyebrow:
+        !data.heroEyebrow ||
+        data.heroEyebrow === 'HARDWARE & INDUSTRIAL SUPPLIES' ||
+        data.heroEyebrow === 'ENGINEERED HEAVY INFRASTRUCTURE'
+          ? "ENGINEERING INDIA'S INFRASTRUCTURE"
+          : data.heroEyebrow,
+      heroHeading:
+        !data.heroHeading ||
+        data.heroHeading === 'Bridge Bearings, Expansion Joints & Hardware' ||
+        data.heroHeading === 'Precision Bridge Bearings & Expansion Joints'
+          ? 'Leading manufacturers of Bridge Bearing and HSFG Bolts'
+          : data.heroHeading,
+      heroDescription:
+        !data.heroDescription || data.heroDescription.includes('Lorem ipsum')
+          ? "Precision-manufactured solutions powering India's infrastructure ambitions."
+          : data.heroDescription,
+    };
+
+    if (
+      auth?.currentUser &&
+      (data.heroEyebrow === 'HARDWARE & INDUSTRIAL SUPPLIES' ||
+        data.heroHeading === 'Bridge Bearings, Expansion Joints & Hardware' ||
+        data.heroDescription?.includes('Lorem ipsum'))
+    ) {
+      setDoc(docRef, sanitized, { merge: true }).catch(() => {});
+    }
+
+    return sanitized;
   }
   return defaultHomepageConfig;
 };
