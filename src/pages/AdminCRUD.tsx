@@ -1718,6 +1718,36 @@ export const AdminCRUD: React.FC = () => {
                 </label>
               </div>
               {uploading && <div className="text-[10px] text-industrial-orange mt-1">Uploading... {uploadProgress.toFixed(0)}%</div>}
+
+              {/* Live True-to-Scale Uncropped Image Preview */}
+              {(editingItem.featuredImage || editingItem.image || editingItem.heroImage || editingItem.thumbnail || editingItem.logo) && entity !== 'documents' && (
+                <div className="mt-3 p-3 bg-gray-50 border border-industrial-border rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5 text-industrial-orange" />
+                      Live Image Preview (100% Uncropped Scale)
+                    </span>
+                    <a
+                      href={editingItem.featuredImage || editingItem.image || editingItem.heroImage || editingItem.thumbnail || editingItem.logo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-industrial-orange hover:underline font-semibold"
+                    >
+                      View Original File ↗
+                    </a>
+                  </div>
+                  <div className="w-full h-52 bg-white rounded border border-gray-200 flex items-center justify-center p-2 relative overflow-hidden">
+                    <img
+                      src={editingItem.featuredImage || editingItem.image || editingItem.heroImage || editingItem.thumbnail || editingItem.logo}
+                      alt="Uploaded preview"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1.5">
+                    Preview rendered in native aspect ratio without any cropping.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Extra file upload for Certifications (PDF link) */}
@@ -1981,6 +2011,7 @@ export const AdminCRUD: React.FC = () => {
             <table className="w-full text-left text-xs border-collapse">
               <thead className="bg-industrial-light text-industrial-dark uppercase font-bold text-[10px] tracking-wider border-b border-industrial-border">
                 <tr>
+                  {entity !== 'documents' && <th className="p-3 w-16 text-center">Image</th>}
                   <th className="p-3">Title / Name</th>
                   {(entity === 'documents' || entity === 'gallery') && <th className="p-3">Category</th>}
                   {entity === 'certifications' && <th className="p-3">Issuing Authority</th>}
@@ -1994,6 +2025,27 @@ export const AdminCRUD: React.FC = () => {
                   .slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
                   .map((item) => (
                     <tr key={item.id} className="hover:bg-gray-50/50">
+                      {entity !== 'documents' && (
+                        <td className="p-3 text-center">
+                          {(() => {
+                            const imgUrl = item.featuredImage || item.image || item.heroImage || item.thumbnail || item.logo;
+                            return imgUrl ? (
+                              <div className="w-12 h-12 rounded border border-industrial-border bg-white flex items-center justify-center p-0.5 mx-auto overflow-hidden">
+                                <img
+                                  src={imgUrl}
+                                  alt=""
+                                  className="max-h-full max-w-full object-contain"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 rounded border border-dashed border-gray-200 bg-gray-50 flex items-center justify-center mx-auto text-gray-300">
+                                <ImageIcon className="w-4 h-4" />
+                              </div>
+                            );
+                          })()}
+                        </td>
+                      )}
                       <td className="p-3 font-semibold text-industrial-dark">{item.name || item.title}</td>
                       {(entity === 'documents' || entity === 'gallery') && (
                         <td className="p-3">

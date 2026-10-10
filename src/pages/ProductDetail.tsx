@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChevronRight, FileText, Download, ShieldCheck, ArrowRight, Package, Mail } from 'lucide-react';
+import { ChevronRight, FileText, Download, ShieldCheck, ArrowRight, Package, Mail, ZoomIn, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
@@ -26,6 +26,7 @@ export const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState<string>('');
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -89,8 +90,23 @@ export const ProductDetail: React.FC = () => {
           
           {/* Left: Image Gallery */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="bg-gray-50 border border-industrial-border rounded-lg p-6 h-96 flex items-center justify-center relative">
+            <div
+              onClick={() => setIsZoomOpen(true)}
+              className="bg-gray-50 border border-industrial-border rounded-lg p-4 sm:p-6 h-80 sm:h-96 flex items-center justify-center relative cursor-zoom-in group hover:border-industrial-orange transition-all"
+              title="Click to view full-size uncropped image"
+            >
               <img src={activeImage} alt={product.name} className="max-h-full max-w-full object-contain" />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsZoomOpen(true);
+                }}
+                className="absolute bottom-3 right-3 bg-white/95 hover:bg-white text-industrial-dark border border-industrial-border shadow-sm px-2.5 py-1 rounded text-[11px] font-semibold flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity"
+              >
+                <ZoomIn className="w-3.5 h-3.5 text-industrial-orange" />
+                <span>Enlarge</span>
+              </button>
             </div>
 
             {/* Gallery Thumbnails */}
@@ -293,6 +309,43 @@ export const ProductDetail: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Product Image Lightbox Modal: 100% Uncropped View */}
+      {isZoomOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <div
+            className="bg-neutral-900 max-w-5xl w-full max-h-[92vh] rounded-lg overflow-hidden border border-gray-800 relative flex flex-col shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-gray-800 text-white bg-neutral-900/95 z-10">
+              <div className="min-w-0 pr-4">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-industrial-orange bg-black/60 px-2 py-0.5 rounded">
+                  {product.categoryName}
+                </span>
+                <h2 className="text-base sm:text-lg font-bold text-white mt-1 truncate">{product.name}</h2>
+              </div>
+              <button
+                onClick={() => setIsZoomOpen(false)}
+                className="p-1.5 text-gray-400 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition-colors shrink-0"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 min-h-[300px] max-h-[75vh] flex items-center justify-center p-2 sm:p-4 bg-black/95">
+              <img
+                src={activeImage}
+                alt={product.name}
+                className="max-h-[70vh] max-w-full w-auto h-auto object-contain rounded"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

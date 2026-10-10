@@ -100,7 +100,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                     onClick={() => handleSelect(`/products/${prod.slug}`)}
                     className="w-full text-left p-2.5 rounded-md hover:bg-industrial-light flex items-center transition-colors group"
                   >
-                    <img src={prod.featuredImage} alt={prod.name} className="w-10 h-10 object-cover rounded border border-industrial-border mr-3" onError={(e) => { e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product'; }} />
+                    <img src={prod.featuredImage} alt={prod.name} className="w-10 h-10 object-contain p-0.5 bg-white rounded border border-industrial-border mr-3" onError={(e) => { e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product'; }} />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-industrial-dark truncate group-hover:text-industrial-orange transition-colors">
                         {prod.name}

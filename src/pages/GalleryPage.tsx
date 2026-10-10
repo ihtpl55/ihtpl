@@ -51,42 +51,86 @@ export const GalleryPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Masonry / Grid */}
+        {/* Gallery Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filtered.map((item) => (
             <div
               key={item.id}
               onClick={() => setActiveItem(item)}
-              className="group relative h-64 rounded-lg overflow-hidden border border-industrial-border cursor-pointer shadow-subtle hover:border-industrial-orange transition-all"
+              className="group bg-white rounded-lg border border-industrial-border overflow-hidden hover:border-industrial-orange transition-all hover:shadow-industrial flex flex-col justify-between cursor-pointer"
             >
-              <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark via-industrial-dark/40 to-transparent"></div>
-              <div className="absolute bottom-0 inset-x-0 p-4 text-white">
-                <span className="text-[10px] font-bold uppercase text-industrial-orange bg-black/60 px-2 py-0.5 rounded">
+              {/* Uncropped Image Display with subtle ambient backdrop */}
+              <div className="relative h-60 sm:h-64 bg-neutral-900 flex items-center justify-center p-2 overflow-hidden">
+                <img
+                  src={item.image}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover blur-md opacity-25 scale-110 pointer-events-none"
+                />
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="relative z-10 max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow"
+                  loading="lazy"
+                />
+                <span className="absolute top-3 left-3 z-20 text-[10px] font-bold uppercase tracking-wider text-industrial-orange bg-black/75 px-2 py-0.5 rounded shadow">
                   {item.category}
                 </span>
-                <h3 className="text-sm font-bold text-white mt-1 line-clamp-1">{item.title}</h3>
+              </div>
+
+              <div className="p-4 bg-white border-t border-industrial-border flex-1 flex flex-col justify-between">
+                <h3 className="text-sm font-bold text-industrial-dark group-hover:text-industrial-orange transition-colors line-clamp-1">
+                  {item.title}
+                </h3>
+                {item.caption && (
+                  <p className="text-xs text-industrial-muted line-clamp-2 mt-1 leading-relaxed">
+                    {item.caption}
+                  </p>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Lightbox Modal */}
+        {/* Lightbox Modal: 100% Uncropped View */}
         {activeItem && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white max-w-3xl w-full rounded-lg overflow-hidden border border-industrial-border relative">
-              <button
-                onClick={() => setActiveItem(null)}
-                className="absolute top-3 right-3 p-1.5 bg-black/60 text-white rounded-full hover:bg-black"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <img src={activeItem.image} alt={activeItem.title} className="w-full h-96 object-cover" />
-              <div className="p-6">
-                <span className="text-xs font-bold text-industrial-orange uppercase">{activeItem.category}</span>
-                <h2 className="text-xl font-bold text-industrial-dark mt-1">{activeItem.title}</h2>
-                {activeItem.caption && <p className="text-xs text-industrial-muted mt-2">{activeItem.caption}</p>}
+          <div
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+            onClick={() => setActiveItem(null)}
+          >
+            <div
+              className="bg-neutral-900 max-w-5xl w-full max-h-[92vh] rounded-lg overflow-hidden border border-gray-800 relative flex flex-col shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-gray-800 text-white bg-neutral-900/95 z-10">
+                <div className="min-w-0 pr-4">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-industrial-orange bg-black/60 px-2 py-0.5 rounded">
+                    {activeItem.category}
+                  </span>
+                  <h2 className="text-base sm:text-lg font-bold text-white mt-1 truncate">{activeItem.title}</h2>
+                </div>
+                <button
+                  onClick={() => setActiveItem(null)}
+                  className="p-1.5 text-gray-400 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition-colors shrink-0"
+                  aria-label="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
+
+              <div className="flex-1 min-h-[280px] max-h-[70vh] flex items-center justify-center p-2 sm:p-4 bg-black/95">
+                <img
+                  src={activeItem.image}
+                  alt={activeItem.title}
+                  className="max-h-[66vh] max-w-full w-auto h-auto object-contain rounded"
+                />
+              </div>
+
+              {activeItem.caption && (
+                <div className="p-4 bg-neutral-900 border-t border-gray-800 text-xs text-gray-300 leading-relaxed">
+                  {activeItem.caption}
+                </div>
+              )}
             </div>
           </div>
         )}

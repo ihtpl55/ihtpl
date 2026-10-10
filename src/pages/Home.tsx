@@ -182,14 +182,14 @@ export const Home: React.FC = () => {
                   to={`/products?category=${cat.slug}`}
                   className="group bg-white rounded-lg border border-industrial-border overflow-hidden hover:border-industrial-orange transition-all hover:shadow-industrial flex flex-col justify-between"
                 >
-                  <div className="relative h-44 sm:h-48 overflow-hidden bg-gray-100">
+                  <div className="relative h-44 sm:h-48 overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4 border-b border-industrial-border">
                     <img
                       src={cat.image}
                       alt={cat.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                     {cat.productCount && (
-                      <span className="absolute top-3 right-3 bg-industrial-dark/90 text-white text-[11px] font-bold px-2.5 py-1 rounded">
+                      <span className="absolute top-3 right-3 bg-industrial-dark/90 text-white text-[11px] font-bold px-2.5 py-1 rounded shadow">
                         {cat.productCount}+ Items
                       </span>
                     )}
