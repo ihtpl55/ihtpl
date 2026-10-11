@@ -98,7 +98,7 @@ export const AdminLayout: React.FC = () => {
           <img
             src="/logo.jpg"
             alt="Infinite Hardware Logo"
-            className="w-8 h-8 object-contain rounded bg-black p-0.5 border border-industrial-slate"
+            className="w-8 h-8 object-contain rounded bg-white p-0.5 border border-industrial-slate"
           />
           <span className="text-sm font-bold tracking-tight group-hover:text-industrial-orange transition-colors">Infinite Hardware</span>
         </Link>
@@ -122,7 +122,7 @@ export const AdminLayout: React.FC = () => {
               <img
                 src="/logo.jpg"
                 alt="Infinite Hardware Logo"
-                className="w-10 h-10 object-contain rounded bg-black p-0.5 border border-industrial-steel group-hover:border-industrial-orange transition-colors shrink-0 shadow-sm"
+                className="w-10 h-10 object-contain rounded bg-white p-0.5 border border-industrial-steel group-hover:border-industrial-orange transition-colors shrink-0 shadow-sm"
               />
               <div className="min-w-0">
                 <div className="text-xs font-black tracking-tight text-white group-hover:text-industrial-orange transition-colors truncate">

@@ -50,7 +50,7 @@ export const AdminLogin: React.FC = () => {
             <img
               src="/logo.jpg"
               alt="Infinite Hardware Logo"
-              className="w-14 h-14 object-contain rounded-md bg-black p-1 mx-auto mb-3 border border-industrial-steel hover:border-industrial-orange transition-colors"
+              className="w-16 h-16 object-contain rounded-md bg-white p-1 mx-auto mb-3 border border-industrial-steel hover:border-industrial-orange transition-colors"
             />
           </Link>
           <h1 className="text-xl font-bold text-white tracking-tight">Infinite Hardware CMS</h1>

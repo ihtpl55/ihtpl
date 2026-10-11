@@ -89,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
             <img
               src="/logo.jpg"
               alt="Infinite Hardware Technology (P) Ltd."
-              className="h-11 w-auto object-contain rounded border border-industrial-border bg-black p-0.5"
+              className="h-12 w-auto object-contain rounded"
             />
             <div>
               <div className="text-base font-black text-industrial-dark tracking-tight leading-none group-hover:text-industrial-orange transition-colors">
@@ -229,7 +229,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
             <div>
               <div className="flex items-center justify-between border-b border-industrial-border pb-4 mb-6">
                 <div className="flex items-center space-x-2">
-                  <img src="/logo.jpg" alt="Infinite Hardware" className="h-8 w-auto bg-black p-0.5 rounded" />
+                  <img src="/logo.jpg" alt="Infinite Hardware" className="h-9 w-auto object-contain rounded" />
                   <div className="font-black text-industrial-dark text-sm">INFINITE HARDWARE</div>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 text-industrial-muted hover:text-industrial-dark">
