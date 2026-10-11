@@ -7,7 +7,7 @@ export interface UploadProgressCallback {
 
 export const uploadFile = async (
   file: File,
-  folder: 'products' | 'projects' | 'documents' | 'certifications' | 'gallery' | 'company' | 'about' | 'leadership',
+  folder: 'products' | 'projects' | 'documents' | 'certifications' | 'gallery' | 'company' | 'about' | 'leadership' | 'hero',
   onProgress?: UploadProgressCallback
 ): Promise<string> => {
   // Validate File Type & Size

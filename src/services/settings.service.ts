@@ -1,6 +1,7 @@
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { NavigationVisibility, SiteSettings } from '../types';
+import { defaultHeroCarouselImages } from './homepage.service';
 
 export const defaultNavVisibility: NavigationVisibility = {
   products: true,
@@ -28,6 +29,7 @@ const emptySettings: SiteSettings = {
   footerDescription: '',
   copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
   navVisibility: defaultNavVisibility,
+  heroCarouselImages: defaultHeroCarouselImages,
 };
 
 const STORAGE_KEY = 'infinite_site_settings_cache';
@@ -42,6 +44,10 @@ export const getCachedSettings = (): SiteSettings => {
         memoryCache = {
           ...emptySettings,
           ...parsed,
+          heroCarouselImages:
+            parsed.heroCarouselImages && parsed.heroCarouselImages.length > 0
+              ? parsed.heroCarouselImages
+              : defaultHeroCarouselImages,
           navVisibility: {
             ...defaultNavVisibility,
             ...(parsed.navVisibility || {}),

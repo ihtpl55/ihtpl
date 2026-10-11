@@ -43,6 +43,7 @@ import { getCertifications, saveCertification, deleteCertification } from '../se
 import { getPosts, savePost, deletePost } from '../services/posts.service';
 import { getSiteSettings, updateSiteSettings } from '../services/settings.service';
 import { getAboutConfig, updateAboutConfig, defaultAboutConfig } from '../services/about.service';
+import { defaultHeroCarouselImages } from '../services/homepage.service';
 import { uploadFile } from '../services/storage.service';
 import { Product, Category, Brand, Project, SiteSettings, NavigationVisibility, Industry, Capability, GalleryItem, Certification, BlogPost, AboutConfig, CoreValue, LeadershipMember } from '../types';
 
@@ -590,6 +591,113 @@ export const AdminCRUD: React.FC = () => {
                           </>
                         )}
                       </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Homepage Hero Carousel Management */}
+            <div className="bg-gray-50 border border-industrial-border rounded-lg p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-industrial-border pb-3">
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-industrial-dark flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-industrial-orange" />
+                    <span>Homepage Hero Carousel (5 Rotating Photos)</span>
+                  </h3>
+                  <p className="text-[11px] text-industrial-muted mt-0.5">
+                    Customize the 5 rotating background photos for the homepage hero carousel. You can upload files or paste image URLs.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSettingsItem({
+                      ...settingsItem,
+                      heroCarouselImages: defaultHeroCarouselImages,
+                    })
+                  }
+                  className="text-[10px] text-industrial-muted hover:text-industrial-orange underline font-semibold self-start sm:self-auto cursor-pointer"
+                >
+                  Reset to Curated Defaults
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {[0, 1, 2, 3, 4].map((slotIdx) => {
+                  const currentList = settingsItem.heroCarouselImages || defaultHeroCarouselImages;
+                  const slideUrl = currentList[slotIdx] || '';
+                  return (
+                    <div
+                      key={slotIdx}
+                      className="bg-white p-3 rounded-lg border border-industrial-border shadow-xs flex flex-col justify-between space-y-2.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-industrial-dark uppercase tracking-wider">
+                          Slide #{slotIdx + 1}
+                        </span>
+                        {slideUrl && (
+                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                            Active
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Thumbnail preview */}
+                      <div className="relative h-24 w-full rounded bg-gray-100 border border-industrial-border overflow-hidden flex items-center justify-center group">
+                        {slideUrl ? (
+                          <img
+                            src={slideUrl}
+                            alt={`Slide ${slotIdx + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        ) : (
+                          <div className="text-[10px] text-gray-400 font-medium flex flex-col items-center">
+                            <ImageIcon className="w-5 h-5 text-gray-300 mb-1" />
+                            <span>No Image</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Upload Button */}
+                      <label className="w-full py-1.5 px-2 bg-industrial-slate hover:bg-industrial-dark text-white rounded text-[11px] font-bold flex items-center justify-center cursor-pointer transition-colors shadow-xs">
+                        <Upload className="w-3 h-3 mr-1 shrink-0" />
+                        <span>{uploading ? 'Uploading...' : 'Upload Photo'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          disabled={uploading}
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setUploading(true);
+                            try {
+                              const uploadedUrl = await uploadFile(file, 'hero', setUploadProgress);
+                              const updated = [...(settingsItem.heroCarouselImages || defaultHeroCarouselImages)];
+                              updated[slotIdx] = uploadedUrl;
+                              setSettingsItem({ ...settingsItem, heroCarouselImages: updated });
+                            } catch (err: any) {
+                              alert(err.message || 'Upload failed');
+                            } finally {
+                              setUploading(false);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {/* Direct URL input */}
+                      <input
+                        type="text"
+                        placeholder="Image URL..."
+                        value={slideUrl}
+                        onChange={(e) => {
+                          const updated = [...(settingsItem.heroCarouselImages || defaultHeroCarouselImages)];
+                          updated[slotIdx] = e.target.value;
+                          setSettingsItem({ ...settingsItem, heroCarouselImages: updated });
+                        }}
+                        className="w-full px-2 py-1 bg-white border border-industrial-border rounded text-[10px] font-mono focus:outline-none focus:border-industrial-orange"
+                      />
                     </div>
                   );
                 })}

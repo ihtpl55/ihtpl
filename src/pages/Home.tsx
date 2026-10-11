@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import {
   ArrowRight,
@@ -6,10 +6,11 @@ import {
   CheckCircle2,
   Truck,
   ChevronRight,
+  ChevronLeft,
   FileText,
   Award,
 } from 'lucide-react';
-import { getHomepageConfig } from '../services/homepage.service';
+import { getHomepageConfig, defaultHeroCarouselImages } from '../services/homepage.service';
 import { getCategories } from '../services/categories.service';
 import { getProducts } from '../services/products.service';
 import { getIndustries } from '../services/industries.service';
@@ -31,7 +32,8 @@ const defaultHomepageConfig: HomepageConfig = {
   heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
   heroHeading: 'Leading manufacturers of Bridge Bearing and HSFG Bolts',
   heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
-  heroImage: '/logo.jpg',
+  heroImage: defaultHeroCarouselImages[0],
+  heroImages: defaultHeroCarouselImages,
   primaryCtaText: 'Explore Product Catalog',
   primaryCtaLink: '/products',
   secondaryCtaText: 'Request Technical Quote',
@@ -104,20 +106,75 @@ export const Home: React.FC = () => {
   const showAbout = nav.about !== false;
   const showContact = nav.contact !== false;
 
+  const heroImages = useMemo(() => {
+    if (effectiveSettings?.heroCarouselImages && effectiveSettings.heroCarouselImages.length > 0) {
+      return effectiveSettings.heroCarouselImages;
+    }
+    if (config.heroImages && config.heroImages.length > 0) {
+      return config.heroImages;
+    }
+    return defaultHeroCarouselImages;
+  }, [effectiveSettings?.heroCarouselImages, config.heroImages]);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Auto-advance carousel every 5 seconds
+  useEffect(() => {
+    if (heroImages.length <= 1 || isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [heroImages.length, isPaused]);
+
+  // Guard against out-of-bounds if images array updates dynamically
+  useEffect(() => {
+    if (currentSlide >= heroImages.length) {
+      setCurrentSlide(0);
+    }
+  }, [heroImages.length, currentSlide]);
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+  };
+
   return (
     <div className="bg-white text-industrial-dark font-sans">
-      {/* Hero */}
-      <section className="relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate">
-        <div className="absolute inset-0 z-0 opacity-25">
-          <img
-            src={config.heroImage}
-            alt="Hero Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-industrial-dark via-industrial-dark/90 to-transparent" />
+      {/* Hero Carousel */}
+      <section
+        className="relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate min-h-[520px] sm:min-h-[580px] flex items-center"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Background Slides with Smooth Crossfade */}
+        <div className="absolute inset-0 z-0">
+          {heroImages.map((img, idx) => (
+            <div
+              key={idx}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                idx === currentSlide ? 'opacity-30' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <img
+                src={img}
+                alt={`Hero Slide ${idx + 1}`}
+                className={`w-full h-full object-cover transition-transform duration-[7000ms] ease-out ${
+                  idx === currentSlide ? 'scale-105' : 'scale-100'
+                }`}
+              />
+            </div>
+          ))}
+          {/* Multi-layer gradient overlays ensuring strong text legibility */}
+          <div className="absolute inset-0 bg-gradient-to-r from-industrial-dark via-industrial-dark/90 to-industrial-dark/60" />
+          <div className="absolute inset-0 bg-radial-at-c from-transparent via-industrial-dark/20 to-industrial-dark/60 pointer-events-none" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
               <ShieldCheck className="w-4 h-4 text-industrial-orange" />
@@ -151,6 +208,45 @@ export const Home: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Carousel Indicators & Controls */}
+        {heroImages.length > 1 && (
+          <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 z-20 flex items-center space-x-2.5 bg-industrial-dark/80 backdrop-blur-md px-3.5 py-2 rounded-full border border-industrial-steel shadow-elevated">
+            <button
+              type="button"
+              onClick={handlePrevSlide}
+              aria-label="Previous slide"
+              className="p-1 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center space-x-1.5 px-1">
+              {heroImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Jump to slide ${idx + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    idx === currentSlide
+                      ? 'w-6 bg-industrial-orange'
+                      : 'w-2 bg-gray-500 hover:bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNextSlide}
+              aria-label="Next slide"
+              className="p-1 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Product Categories */}
