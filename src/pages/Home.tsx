@@ -30,7 +30,7 @@ import {
 } from '../types';
 const defaultHomepageConfig: HomepageConfig = {
   heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
-  heroHeading: 'Leading manufacturers of Bridge Bearing and HSFG Bolts',
+  heroHeading: 'Leading manufacturers of Bridge bearings and HSFG Bolts',
   heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: defaultHeroCarouselImages[0],
   heroImages: defaultHeroCarouselImages,
@@ -146,11 +146,14 @@ export const Home: React.FC = () => {
   const renderHeroHeading = (heading?: string) => {
     if (!heading) return null;
     const normalized = heading.replace(/\s+/g, ' ').trim();
-    if (normalized === 'Leading manufacturers of Bridge Bearing and HSFG Bolts') {
+    if (
+      normalized.toLowerCase() === 'leading manufacturers of bridge bearings and hsfg bolts' ||
+      normalized.toLowerCase() === 'leading manufacturers of bridge bearing and hsfg bolts'
+    ) {
       return (
         <>
           <span className="block">Leading manufacturers</span>
-          <span className="block">of Bridge Bearing</span>
+          <span className="block">of Bridge bearings</span>
           <span className="block">and HSFG Bolts</span>
         </>
       );

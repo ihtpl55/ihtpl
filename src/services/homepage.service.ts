@@ -12,7 +12,7 @@ export const defaultHeroCarouselImages = [
 
 const defaultHomepageConfig: HomepageConfig = {
   heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
-  heroHeading: 'Leading manufacturers of Bridge Bearing and HSFG Bolts',
+  heroHeading: 'Leading manufacturers of Bridge bearings and HSFG Bolts',
   heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: defaultHeroCarouselImages[0],
   heroImages: defaultHeroCarouselImages,
@@ -63,8 +63,9 @@ export const getHomepageConfig = async (): Promise<HomepageConfig> => {
       heroHeading:
         !data.heroHeading ||
         data.heroHeading === 'Bridge Bearings, Expansion Joints & Hardware' ||
-        data.heroHeading === 'Precision Bridge Bearings & Expansion Joints'
-          ? 'Leading manufacturers of Bridge Bearing and HSFG Bolts'
+        data.heroHeading === 'Precision Bridge Bearings & Expansion Joints' ||
+        data.heroHeading === 'Leading manufacturers of Bridge Bearing and HSFG Bolts'
+          ? 'Leading manufacturers of Bridge bearings and HSFG Bolts'
           : data.heroHeading,
       heroDescription:
         !data.heroDescription || data.heroDescription.includes('Lorem ipsum')
@@ -76,6 +77,7 @@ export const getHomepageConfig = async (): Promise<HomepageConfig> => {
       auth?.currentUser &&
       (data.heroEyebrow === 'HARDWARE & INDUSTRIAL SUPPLIES' ||
         data.heroHeading === 'Bridge Bearings, Expansion Joints & Hardware' ||
+        data.heroHeading === 'Leading manufacturers of Bridge Bearing and HSFG Bolts' ||
         data.heroDescription?.includes('Lorem ipsum'))
     ) {
       setDoc(docRef, sanitized, { merge: true }).catch(() => {});

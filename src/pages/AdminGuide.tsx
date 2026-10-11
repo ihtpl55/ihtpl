@@ -746,7 +746,7 @@ export const AdminGuide: React.FC = () => {
               <br />
               <span className="font-mono text-[11px] text-industrial-dark font-semibold">
                 1. Leading manufacturers<br />
-                2. of Bridge Bearing<br />
+                2. of Bridge bearings<br />
                 3. and HSFG Bolts
               </span>
               <br />
