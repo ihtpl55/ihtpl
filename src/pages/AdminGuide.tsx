@@ -22,11 +22,12 @@ import {
   Sparkles,
   Info,
   ShieldAlert,
+  Maximize2,
 } from 'lucide-react';
 
 interface GuideSection {
   id: string;
-  category: 'catalog' | 'company' | 'content' | 'settings';
+  category: 'overview' | 'catalog' | 'company' | 'media' | 'settings';
   title: string;
   adminPath: string;
   livePath: string;
@@ -48,35 +49,61 @@ export const AdminGuide: React.FC = () => {
 
   const guides: GuideSection[] = [
     {
+      id: 'enquiries',
+      category: 'overview',
+      title: 'Customer Enquiries & Lead Tracking',
+      adminPath: '/admin?tab=enquiries',
+      livePath: '/contact',
+      liveName: 'Contact & Quotation Forms (/contact & /products/:slug)',
+      icon: Mail,
+      summary: 'Review, manage, and follow up on customer quote requests and engineering inquiries.',
+      whatItDoes:
+        'This is your internal sales inbox. Every time a contractor, design consultant, or procurement officer clicks "Request Technical Quote" on a product page or submits the Contact Us form, their request lands here with name, phone, email, company, and requested hardware specs.',
+      stepByStep: [
+        'Open "Customer Enquiries" in the sidebar (red badge indicates unread requests).',
+        'Review the customer name, phone number, company, and specific product requested.',
+        'Click the status button to advance the lead: "Mark Contacted" once your sales engineer reaches out, and "Close" once the inquiry is quoted or completed.',
+        'Use the customer contact details to send engineering drawings or formal quotation sheets via email or WhatsApp.',
+      ],
+      liveEffects: [
+        'Does not alter the public website; this is strictly an internal sales workflow dashboard.',
+        'Updates the red unread count badge in your sidebar so team members know when new leads arrive.',
+      ],
+      dosAndDonts: {
+        do: 'Check enquiries daily during business hours so contractors receive prompt quotation responses while tendering.',
+        dont: "Don't leave new inquiries untouched. Fast quotation turnaround wins major infrastructure bids.",
+      },
+    },
+    {
       id: 'products',
       category: 'catalog',
-      title: 'Products & Items',
+      title: 'Products & Catalog Items',
       adminPath: '/admin/crud/products',
       livePath: '/products',
       liveName: 'Product Catalog (/products)',
       icon: Package,
-      summary: 'Add, update, or remove engineering products like Bearings, Expansion Joints, and Couplings.',
+      summary: 'Add, update, or remove engineering products like POT-PTFE Bearings, Expansion Joints, and HSFG Bolts.',
       whatItDoes:
-        'This is the heart of your business catalog. Every product you add here gives customers all the details, photos, and engineering specifications they need to request a quotation.',
+        'This is the heart of your engineering catalog. Every product you add gives clients all the details, technical specifications, load capacities, and photos they need to request a quotation.',
       stepByStep: [
-        'Click "+ Add Product" at the top right of the page.',
-        'Enter the Product Name (e.g. "POT-PTFE Bridge Bearing").',
+        'Click "+ Add New Item" at the top right of the page.',
+        'Enter the Product Name (e.g. "POT-PTFE Bridge Bearing", "Strip Seal Expansion Joint", "HSFG Grade 8.8 / 10.9 Structural Bolts").',
         'Select the Product Category from the dropdown (make sure you created the category first!).',
-        'Paste an Image Link (e.g. an image URL hosted online or a placeholder).',
+        'Upload a photo or paste an image URL. Inspect the "Live Image Preview (100% Uncropped Scale)" to make sure the item is shown completely without cutoffs.',
         'Add a brief Summary and Full Description.',
-        'Add Technical Specifications key-by-key (e.g., "Load Capacity": "Up to 5000 kN", "Standard": "IRC:83 / EN 1337").',
-        'Turn "Published" ON so it appears on the website, and tick "Featured" if you want it on the homepage spotlight.',
-        'Click "Create Product" to save.',
+        'Add Technical Specifications key-by-key (e.g., "Vertical Load": "Up to 50,000 kN", "Standards": "IRC:83 (Part III) / EN 1337", "Material": "Cast Steel BS 3100 / EN 10083").',
+        'Turn "Published" ON so it appears on the website, and tick "Featured" if you want it spotlighted on the homepage.',
+        'Click "Save Changes" to publish.',
       ],
       liveEffects: [
-        'Immediately shows up on the main Products Catalog page (/products).',
-        'Creates its own full detail page (/products/your-product-name) with a working "Request Quotation" button.',
+        'Immediately shows up on the main Products Catalog page (/products) and sidebar category filters.',
+        'Creates its own dedicated page (/products/your-product-slug) with an uncropped image viewer, specifications table, and "Request Quotation" modal.',
         'If marked as "Featured", it displays on the Homepage featured products grid.',
-        'Customers can search for it by name or specification in the search bar.',
+        'Searchable instantly by name or specification in the global search modal.',
       ],
       dosAndDonts: {
-        do: 'Add clear specifications (Load, Material, Standards). Civil engineers rely on these to send quote requests.',
-        dont: "Don't leave the image empty. A product with a missing picture looks incomplete to potential clients.",
+        do: 'Add clear specifications (Load, Material, Standards). Civil engineers rely on these exact numbers for bill of quantities (BOQ).',
+        dont: "Don't upload low-resolution or heavily cropped photos. Our uncropped display shows full dimensions, so high-clarity photos look best.",
       },
     },
     {
@@ -85,26 +112,55 @@ export const AdminGuide: React.FC = () => {
       title: 'Product Categories',
       adminPath: '/admin/crud/categories',
       livePath: '/products',
-      liveName: 'Catalog Filters & Navigation',
+      liveName: 'Catalog Sidebar & Filter Navigation',
       icon: FolderTree,
-      summary: 'Create and organize major product groups (e.g. Bridge Bearings, Expansion Joints).',
+      summary: 'Organize primary product categories (Bridge Bearings, Expansion Joints, Couplings, Fasteners).',
       whatItDoes:
-        'Categories act as folders for your products. They allow visitors to quickly filter down to the exact equipment they need without scrolling through hundreds of items.',
+        'Categories act as primary folders for your catalog. They allow website visitors and bridge designers to quickly filter down to the exact equipment they need without browsing unrelated items.',
       stepByStep: [
-        'Click "+ Add Category".',
-        'Type the Category Name (e.g. "Elastomeric Bearings").',
-        'Write a short description explaining what this category covers.',
+        'Click "+ Add New Item".',
+        'Type the Category Name (e.g. "Bridge Bearings", "Expansion Joints", "Structural Fasteners").',
+        'Write a short description explaining what types of hardware this category covers.',
         'Choose a Sort Order number (e.g. 1 for top priority, 2 for second, etc.).',
-        'Make sure "Published" is switched ON and click "Create Category".',
+        'Upload a representative category photo or paste an image URL.',
+        'Make sure "Published" is switched ON and click "Save Changes".',
       ],
       liveEffects: [
         'Adds a clickable filter option in the left sidebar of the Products page.',
-        'Shows up in the main navigation menu so visitors can jump straight to that line of products.',
+        'Updates the Product Category cards on the Homepage (displays clean card with image, title, and "Explore Category" button).',
         'Becomes available in the Category dropdown when adding or editing products.',
       ],
       dosAndDonts: {
-        do: 'Group similar products together so clients can find bearings, joints, or couplings in one click.',
+        do: 'Keep category titles concise and aligned with civil infrastructure terminology.',
         dont: 'Do NOT delete a category if you still have active products inside it! Reassign those products to another category first.',
+      },
+    },
+    {
+      id: 'about',
+      category: 'company',
+      title: 'About Us, Mission, Values & Leadership',
+      adminPath: '/admin/crud/about',
+      livePath: '/about',
+      liveName: 'About Infinite Hardware (/about)',
+      icon: Info,
+      summary: 'Edit company background, manufacturing heritage, mission & vision, core values, and executive leadership profiles.',
+      whatItDoes:
+        'Presents your engineering credibility, manufacturing capabilities, corporate heritage ("Precision Made in India"), ethical governance, and leadership team to prospective clients and tender evaluation boards.',
+      stepByStep: [
+        'Open "About & Leadership" in the sidebar menu.',
+        'Edit Section 1 (Company Story & Facilities): update your background summary, facility photo, and quality compliance highlights.',
+        'Edit Section 2 (Mission & Vision): customize your long-term infrastructure mission and technological vision statements.',
+        'Edit Section 3 (Core Values): click "+ Add New Value" to add pillars, choose custom icon styles, and define engineering commitments.',
+        'Edit Section 4 (Executive Leadership Team): add founders, directors, and technical heads with name, role, photo, bio, and LinkedIn URL.',
+        'Click "Save About & Leadership Content" at the bottom to publish changes instantly.',
+      ],
+      liveEffects: [
+        'Immediately updates the public /about page with the new story, mission, vision, values grid, and leadership cards.',
+        'Use the "Public Tab: Visible / Hidden" toggle at the top right to show or hide the About tab from the website anytime.',
+      ],
+      dosAndDonts: {
+        do: 'Highlight certified technical credentials, ISO standards, and real leadership profiles to establish engineering trust.',
+        dont: "Don't leave placeholder executive bios once real leadership photos and credentials are ready.",
       },
     },
     {
@@ -115,15 +171,15 @@ export const AdminGuide: React.FC = () => {
       livePath: '/industries',
       liveName: 'Industries Page (/industries)',
       icon: Building2,
-      summary: 'Highlight the key infrastructure sectors you serve (Highways, Railways, Metros, Heavy Industry).',
+      summary: 'Highlight the key infrastructure sectors you supply (Highways, Railways, Metros, Heavy Industry).',
       whatItDoes:
         'Clients and government contractors want to know where your hardware is typically installed. This section showcases your expertise across major civil engineering fields.',
       stepByStep: [
-        'Click "+ Add Industry".',
-        'Enter Industry Name (e.g. "High-Speed Rail & Metros").',
-        'Paste a banner image link showing real construction or trains.',
+        'Click "+ Add New Item".',
+        'Enter Industry Name (e.g. "High-Speed Rail & Metros", "Highway Bridges & Flyovers").',
+        'Upload or paste a banner image link showing real construction or train viaducts.',
         'List 3-4 Key Applications (e.g., "Viaduct Piers", "Track Expansion Joints", "Seismic Isolation").',
-        'Click "Create Industry" to save.',
+        'Click "Save Changes".',
       ],
       liveEffects: [
         'Updates the cards on the dedicated /industries page.',
@@ -132,26 +188,26 @@ export const AdminGuide: React.FC = () => {
       ],
       dosAndDonts: {
         do: 'Use realistic photos of bridge, railway, or flyover work to build high credibility.',
-        dont: "Don't create too many overlapping industries; 4 to 6 core sectors keep the website looking crisp and focused.",
+        dont: "Don't create too many overlapping industries; 4 to 6 core sectors keep the website crisp and focused.",
       },
     },
     {
       id: 'capabilities',
       category: 'company',
-      title: 'Capabilities & Services',
+      title: 'Capabilities & Plant Machinery',
       adminPath: '/admin/crud/capabilities',
       livePath: '/capabilities',
       liveName: 'Capabilities Page (/capabilities)',
       icon: Wrench,
-      summary: 'Show off your manufacturing machines, engineering capacity, testing facilities, and fabrication services.',
+      summary: 'Showcase your manufacturing machinery, CNC fabrication, heavy testing rigs, and quality testing labs.',
       whatItDoes:
-        'Consultants and tender committees inspect this page to ensure your factory has the machinery and testing equipment to fulfill massive infrastructure contracts.',
+        'Consultants and tender committees inspect this page to ensure your plant has the heavy machinery and testing equipment to fulfill massive infrastructure contracts.',
       stepByStep: [
-        'Click "+ Add Capability".',
-        'Name your capability (e.g., "Heavy CNC Machining & Milling", "Load Testing Facility").',
-        'Describe the machinery or laboratory process.',
-        'List Key Highlights (e.g., "Tolerances up to 0.02mm", "In-house 10,000 kN Test Rig").',
-        'Click Save.',
+        'Click "+ Add New Item".',
+        'Name your capability (e.g., "Heavy CNC Machining & Milling", "Vertical & Shear Load Testing Rig").',
+        'Describe the machinery or laboratory testing process.',
+        'List Key Highlights (e.g., "Tolerances up to 0.02 mm", "In-house 10,000 kN Test Rig", "Ultrasonic & MPI NDT Testing").',
+        'Click "Save Changes".',
       ],
       liveEffects: [
         'Updates the /capabilities page.',
@@ -163,80 +219,23 @@ export const AdminGuide: React.FC = () => {
       },
     },
     {
-      id: 'gallery',
-      category: 'content',
-      title: 'Media Gallery',
-      adminPath: '/admin/crud/gallery',
-      livePath: '/gallery',
-      liveName: 'Plant & Site Gallery (/gallery)',
-      icon: ImageIcon,
-      summary: 'Upload or link photos of your factory, manufacturing floor, testing equipment, and finished hardware, and manage gallery photo categories.',
-      whatItDoes:
-        'A picture is worth a thousand words. High-resolution factory and product photos prove that Infinite Hardware is an authentic direct manufacturer with heavy machinery. You can also customize the categories visitors use to filter photos.',
-      stepByStep: [
-        'To organize photo tags, click "Manage Categories" at the top: you can add new categories (e.g. "Testing & Inspection") or delete unneeded ones (existing photos get safely reassigned).',
-        'Click "+ Add New Item" to upload or link a new photo.',
-        'Enter an Image Title (e.g., "POT Bearing Final Inspection Rig").',
-        'Choose a Gallery Category from the list, or click "+ Type New" to type a fresh category name on the fly.',
-        'Paste the direct Image URL or click "Upload File" to select a photo from your computer.',
-        'Add an optional caption explaining the engineering process shown.',
-        'Click "Save Changes".',
-      ],
-      liveEffects: [
-        'Instantly appears on the public /gallery page with photo zoom lightbox modal.',
-        'Visitors can filter photos by all active categories on the website.',
-      ],
-      dosAndDonts: {
-        do: 'Use clear, well-lit photos taken in the workshop or on the bridge installation site.',
-        dont: "Don't upload blurry or watermarked stock photos from other websites.",
-      },
-    },
-    {
-      id: 'about',
-      category: 'company',
-      title: 'About Us, Mission, Values & Leadership',
-      adminPath: '/admin/crud/about',
-      livePath: '/about',
-      liveName: 'About Infinite Hardware (/about)',
-      icon: Info,
-      summary: 'Edit your company story, mission & vision statements, core values, and executive leadership profiles.',
-      whatItDoes:
-        'Presents your engineering credibility, corporate heritage, ethical governance, and executive leadership team to prospective clients and tender evaluation boards.',
-      stepByStep: [
-        'Open "About & Leadership" in the left sidebar menu.',
-        'Edit Section 1 (Company Story & Facilities): update your background summary, facility photo, and quality compliance highlights.',
-        'Edit Section 2 (Mission & Vision): customize your long-term infrastructure mission and technological vision statements.',
-        'Edit Section 3 (Core Values): click "+ Add New Value" to add pillars, choose custom icon styles, and define engineering commitments.',
-        'Edit Section 4 (Executive Leadership Team): add founders, directors, and technical heads with name, role, photo, bio, and LinkedIn link.',
-        'Click "Save About & Leadership Content" at the bottom to publish changes instantly.',
-      ],
-      liveEffects: [
-        'Immediately updates the public /about page with the new mission, vision, values grid, and leadership cards.',
-        'You can also use the "Public Tab: Visible / Hidden" toggle at the top right to show or hide the About tab from the website anytime.',
-      ],
-      dosAndDonts: {
-        do: 'Highlight certified technical credentials, ISO standards, and real leadership profiles to establish engineering trust.',
-        dont: "Don't leave default placeholder names or bios once your real leadership profiles are ready.",
-      },
-    },
-    {
       id: 'projects',
       category: 'company',
-      title: 'Case Studies / Projects',
+      title: 'Projects & Case Studies',
       adminPath: '/admin/crud/projects',
       livePath: '/projects',
       liveName: 'Projects Showcase (/projects)',
       icon: Briefcase,
       summary: 'Document completed infrastructure projects where your hardware was supplied (Flyovers, Expressways, Metros).',
       whatItDoes:
-        'Nothing convinces a bridge contractor faster than seeing other famous bridges and flyovers where your bearings and expansion joints are successfully installed.',
+        'Nothing convinces a bridge contractor faster than seeing real bridges, viaducts, and flyovers where your bearings, joints, or bolts are successfully installed.',
       stepByStep: [
-        'Click "+ Add Project".',
-        'Enter Project Name (e.g., "Delhi-Mumbai Expressway Package 4").',
-        'Fill in the Client Name (e.g. NHAI / L&T Construction), Location, and Year Completed.',
-        'List Products Supplied (e.g. "240 Spherical Bearings, 1.2 km Modular Expansion Joints").',
+        'Click "+ Add New Item".',
+        'Enter Project Name (e.g., "Delhi-Mumbai Expressway Package 4", "Regional Rapid Transit System (RRTS)").',
+        'Fill in the Client / Authority Name (e.g. NHAI / L&T Construction / NCRTC), Location, and Year Completed.',
+        'List Products Supplied (e.g. "240 POT-PTFE Bearings, 1.2 km Modular Expansion Joints").',
         'Provide a photo of the completed flyover or bridge.',
-        'Click Save.',
+        'Click "Save Changes".',
       ],
       liveEffects: [
         'Shows on the public /projects directory.',
@@ -249,50 +248,81 @@ export const AdminGuide: React.FC = () => {
     },
     {
       id: 'documents',
-      category: 'content',
-      title: 'Document Library',
+      category: 'media',
+      title: 'Document Center',
       adminPath: '/admin/crud/documents',
       livePath: '/resources/documents',
-      liveName: 'Technical Resources (/resources/documents)',
+      liveName: 'Document Center (/resources/documents & /documents)',
       icon: FileText,
-      summary: 'Provide downloadable PDFs like Technical Catalogs, IRC Approvals, Datasheets, and Manuals.',
+      summary: 'Provide downloadable PDFs like Technical Catalogs, ISO Certifications, Vendor Approvals, and Fastener Specs.',
       whatItDoes:
-        'Engineers, designers, and quantity surveyors need official PDFs for their project documentation and approval files. This tab serves as your online download center.',
+        'Engineers, structural consultants, and quantity surveyors need official PDFs for their approval files. This tab serves as your online download center with dynamic category grouping.',
       stepByStep: [
-        'Click "+ Add Document".',
-        'Enter Document Title (e.g., "Infinite Hardware Complete Product Catalog 2026").',
-        'Select Document Type (Datasheet, Certificate, Manual, or Brochure).',
-        'Paste the File URL (e.g., a link to your Google Drive PDF, Dropbox file, or hosted PDF).',
-        'Mention file size or page count (e.g., "PDF - 4.2 MB").',
-        'Click Save.',
+        'To manage document categories, click "Manage Categories" at the top: add new categories (e.g. "Vendor Approvals", "Fastener Specifications") or delete unneeded ones.',
+        'Click "+ Add New Item" to add a document.',
+        'Enter Document Title (e.g., "Infinite Hardware Complete Product Catalog 2026", "ISO 9001:2015 Quality Certificate").',
+        'Select Document Category from the list, or click "+ Type New" to type a new category on the fly.',
+        'Paste the File URL (or a link to your Google Drive / cloud PDF) or upload a file directly.',
+        'Mention file size (e.g., "PDF - 4.2 MB").',
+        'Click "Save Changes".',
       ],
       liveEffects: [
-        'Adds a downloadable card on the /resources/documents page.',
+        'Adds a downloadable card on the /resources/documents and /documents pages.',
         'Visitors can click "Download PDF" to immediately view or save the file.',
       ],
       dosAndDonts: {
         do: 'If using Google Drive for PDFs, make sure the link sharing setting is set to "Anyone with the link can view".',
-        dont: "Don't paste private internal company links that require login.",
+        dont: "Don't paste private internal company links that require login credentials.",
+      },
+    },
+    {
+      id: 'gallery',
+      category: 'media',
+      title: 'Media Gallery',
+      adminPath: '/admin/crud/gallery',
+      livePath: '/gallery',
+      liveName: 'Plant & Site Gallery (/gallery)',
+      icon: ImageIcon,
+      summary: 'Upload photos of your factory, manufacturing floor, testing equipment, and finished hardware with category filters.',
+      whatItDoes:
+        'Proves that Infinite Hardware is an authentic direct manufacturer with heavy machinery. Features 100% uncropped display with soft ambient backgrounds and full-screen Lightbox zoom.',
+      stepByStep: [
+        'To organize photo tags, click "Manage Categories" at the top: add new categories (e.g. "Testing & Inspection", "Machining Plant") or remove unneeded ones.',
+        'Click "+ Add New Item" to add a new photo.',
+        'Enter an Image Title (e.g., "POT Bearing Final Inspection Rig", "CNC Lathe Turning").',
+        'Choose a Gallery Category from the list, or click "+ Type New" to type a new category.',
+        'Upload a photo directly or paste a high-resolution Image URL. Check the "Live Image Preview (100% Uncropped Scale)" frame.',
+        'Add an optional caption explaining the engineering process shown.',
+        'Click "Save Changes".',
+      ],
+      liveEffects: [
+        'Instantly appears on the public /gallery page.',
+        'Renders in 100% native uncropped aspect ratio with ambient background blur and click-to-zoom Lightbox modal.',
+        'Visitors can filter photos by all active categories on the website.',
+      ],
+      dosAndDonts: {
+        do: 'Use clear, well-lit photos taken in the workshop or on the bridge installation site.',
+        dont: "Don't upload blurry or watermarked stock photos from other websites.",
       },
     },
     {
       id: 'posts',
-      category: 'content',
-      title: 'Insights Blog',
+      category: 'media',
+      title: 'Industry Insights & Technical Blog',
       adminPath: '/admin/crud/posts',
       livePath: '/insights',
-      liveName: 'Engineering Blog (/insights)',
+      liveName: 'Engineering Insights (/insights)',
       icon: BookOpen,
-      summary: 'Publish engineering articles, technical guides, company news, and industry updates.',
+      summary: 'Publish engineering articles, technical installation guides, company news, and industry updates.',
       whatItDoes:
-        'Articles educate clients on why quality bearings matter, boost your company’s search engine ranking on Google, and position your team as thought leaders.',
+        'Educates clients on why precision bearings matter, boosts company ranking on Google (SEO), and positions Infinite Hardware as an engineering thought leader.',
       stepByStep: [
-        'Click "+ Add Post".',
-        'Enter Article Title (e.g., "How to Select the Right Expansion Joint for Long-Span Bridges").',
+        'Click "+ Add New Item".',
+        'Enter Article Title (e.g., "How to Select the Right Expansion Joint for Long-Span Bridges", "Best Practices for HSFG Bolt Pre-Tensioning").',
         'Write an informative excerpt and the main body text.',
         'Add a Cover Image URL.',
         'Select Author and Category.',
-        'Turn "Published" ON and click Save.',
+        'Turn "Published" ON and click "Save Changes".',
       ],
       liveEffects: [
         'Publishes to the /insights article list.',
@@ -307,57 +337,33 @@ export const AdminGuide: React.FC = () => {
     {
       id: 'settings',
       category: 'settings',
-      title: 'Site Settings',
+      title: 'Site Settings & Hero Carousel',
       adminPath: '/admin/crud/settings',
       livePath: '/contact',
-      liveName: 'Header, Footer & Contact Page',
+      liveName: 'Homepage Carousel, Navigation & Contact (/contact)',
       icon: Settings,
-      summary: 'Manage your global company phone numbers, WhatsApp, official email, address, Google Map, AND Show / Hide entire website tabs.',
+      summary: 'Manage the 5-slide rotating hero carousel, show/hide website tabs, update phone, WhatsApp, email, office name, and Google Maps.',
       whatItDoes:
-        'This is the single source of truth for the entire website. Here you can update company contact details and also decide which entire tabs (Products, Industries, Projects, etc.) appear on the public website.',
+        'This is the master command center for the entire website. Here you configure the homepage background slideshow, toggle public visibility for any page, and update official company contact information.',
       stepByStep: [
-        'Open the Site Settings tab.',
-        'Under "Website Tabs Visibility", click any tab\'s button (Visible / Hidden) to immediately show or hide that whole page from the website.',
-        'Update Phone Number, Mobile / WhatsApp, and Sales Email.',
-        'Update your Factory / Office Physical Address.',
-        'In the "Google Maps Link" field, paste your Google Maps link.',
-        'Click "Save All Settings".',
+        'Open "Site Settings" in the sidebar.',
+        'Hero Carousel Section: Upload or paste 5 rotating industrial photos. Click "Upload Photo" to select a file from your computer, or "Reset to Curated Defaults" if needed.',
+        'Website Tabs Visibility: Click any tab button (Visible / Hidden) to immediately show or hide that whole page from the public navigation and footer.',
+        'Contact Details: Update Phone Number, Mobile / WhatsApp, and Sales Email.',
+        'Office & Legal Name: Set official company name ("Infinite Hardware Tech. Pvt. Ltd.") and physical plant address.',
+        'Google Maps: Paste your Google Maps share link to update the interactive map and directions button on the Contact page.',
+        'Click "Save All Settings" at the bottom to publish live.',
       ],
       liveEffects: [
+        'The homepage hero cycles through your 5 photos every 5 seconds with gentle crossfade and pause on hover.',
         'Instantly adds or removes entire tabs from the top header navigation, mobile drawer, and footer.',
         'If a tab is hidden, visitors who type its URL directly are smoothly redirected home.',
         'Instantly updates phone & email in the header, footer, and contact page.',
-        'Updates the interactive map and "Get Directions" button on the /contact page.',
+        'Updates the interactive map on the /contact page.',
       ],
       dosAndDonts: {
-        do: 'Use the "Visible / Hidden" switches to easily hide tabs like Projects or Capabilities if you are still updating their content.',
-        dont: "Don't leave the email or phone blank, as visitors won't be able to reach your sales team.",
-      },
-    },
-    {
-      id: 'enquiries',
-      category: 'settings',
-      title: 'Customer Enquiries',
-      adminPath: '/admin?tab=enquiries',
-      livePath: '/contact',
-      liveName: 'Lead Capture & Quote Requests',
-      icon: Mail,
-      summary: 'Review and manage inbound quote requests and messages sent by potential clients.',
-      whatItDoes:
-        'Every time a visitor fills out the "Get Quotation" form on a product page or the "Contact Us" form, their message lands safely here with timestamp and contact information.',
-      stepByStep: [
-        'Click "Customer Enquiries" in the sidebar.',
-        'Click on any customer name to view their full message, phone, email, and requested products.',
-        'Update the Status dropdown as you work: New ➔ In Review ➔ Contacted ➔ Closed.',
-        'Add internal notes so your sales teammates know the quote status.',
-      ],
-      liveEffects: [
-        'Does not change the public website; this is your internal sales inbox.',
-        'Updates the red unread notification badge in your admin sidebar.',
-      ],
-      dosAndDonts: {
-        do: 'Check enquiries daily during business hours so contractors receive prompt quotation responses.',
-        dont: "Don't delete enquiries right away; keep them for sales history and client follow-ups.",
+        do: 'For the hero carousel, use high-resolution landscape images (1920×1080 or 2560×1440, under 2 MB) for the best visual experience.',
+        dont: "Don't leave the phone or email blank, as visitors won't be able to reach your sales team.",
       },
     },
   ];
@@ -372,7 +378,7 @@ export const AdminGuide: React.FC = () => {
   });
 
   return (
-    <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-10">
+    <div className="p-6 md:p-10 max-w-6xl mx-auto space-y-10 font-sans">
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-industrial-dark via-gray-900 to-industrial-dark text-white p-8 rounded-xl border border-industrial-slate shadow-md relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
@@ -384,7 +390,7 @@ export const AdminGuide: React.FC = () => {
             How to Use the Admin Portal
           </h1>
           <p className="text-gray-300 text-sm leading-relaxed mb-6">
-            Welcome! This guide is designed for your day-to-day office and sales operations. Learn how each tab works, how to add products and documents, and see exactly where each update appears on the live public website.
+            Welcome! This guide is designed for your day-to-day office, marketing, and sales operations. Learn how each tab works, how to manage products, photos, carousel slides, and documents, and see exactly where each update appears on the live public website.
           </p>
           <div className="flex flex-wrap gap-3 text-xs font-semibold">
             <a
@@ -392,31 +398,31 @@ export const AdminGuide: React.FC = () => {
               className="bg-white/10 hover:bg-white/20 text-white px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5"
             >
               <Info className="w-4 h-4 text-industrial-orange" />
-              <span>3 Golden Rules for Operators</span>
+              <span>4 Golden Rules for Operators</span>
             </a>
             <a
               href="#module-breakdown"
               className="bg-industrial-orange text-white px-3.5 py-2 rounded-lg hover:bg-industrial-orange/90 transition-colors flex items-center gap-1.5"
             >
-              <span>Explore All Tabs Below</span>
+              <span>Explore All 11 Modules Below</span>
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
         </div>
       </div>
 
-      {/* 3 Golden Rules Section */}
+      {/* 4 Golden Rules Section */}
       <div id="golden-rules" className="space-y-4">
         <div className="flex items-center space-x-2">
           <CheckCircle2 className="w-5 h-5 text-industrial-orange" />
-          <h2 className="text-xl font-bold text-industrial-dark">3 Golden Rules Every Staff Member Should Know</h2>
+          <h2 className="text-xl font-bold text-industrial-dark">4 Golden Rules Every Staff Member Should Know</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Rule 1 */}
           <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-sm flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-lg bg-green-100 text-green-700 flex items-center justify-center font-black text-lg mb-3">
+              <div className="w-9 h-9 rounded-lg bg-green-100 text-green-700 flex items-center justify-center font-black text-base mb-3">
                 1
               </div>
               <h3 className="font-bold text-sm text-industrial-dark mb-1.5 flex items-center gap-2">
@@ -427,63 +433,86 @@ export const AdminGuide: React.FC = () => {
                 Every product, category, and document has a <strong>"Published"</strong> switch.
               </p>
               <ul className="mt-2.5 space-y-1.5 text-xs text-industrial-dark">
-                <li className="flex items-start gap-2">
+                <li className="flex items-start gap-1.5">
                   <span className="text-green-600 font-bold">●</span>
                   <span><strong>Green (ON):</strong> Live immediately for all website visitors.</span>
                 </li>
-                <li className="flex items-start gap-2">
+                <li className="flex items-start gap-1.5">
                   <span className="text-gray-400 font-bold">●</span>
-                  <span><strong>Grey (OFF):</strong> Saved as a draft. Hidden from the website, safe for you to finish later.</span>
+                  <span><strong>Grey (OFF):</strong> Saved safely as draft. Hidden from public view.</span>
                 </li>
               </ul>
             </div>
             <div className="mt-4 pt-3 border-t border-industrial-border text-[11px] text-industrial-muted italic">
-              Tip: When preparing new catalog items, save them as drafts first, then publish when ready!
+              Tip: Prepare new items as drafts, then publish when specifications are finalized.
             </div>
           </div>
 
           {/* Rule 2 */}
           <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-sm flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-black text-lg mb-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-black text-base mb-3">
                 2
               </div>
               <h3 className="font-bold text-sm text-industrial-dark mb-1.5 flex items-center gap-2">
-                <span>Hide Items & Entire Tabs</span>
+                <span>Hide Entire Website Tabs</span>
                 <ShieldAlert className="w-4 h-4 text-amber-600" />
               </h3>
               <p className="text-xs text-industrial-muted leading-relaxed">
-                Need to hide a single product, or <strong>an entire tab (e.g. Projects)</strong>?
+                Need to hide a single item or <strong>an entire public tab</strong> (e.g. Projects or Insights)?
               </p>
               <p className="text-xs text-industrial-dark mt-2 leading-relaxed">
-                • <strong>Single Item:</strong> Edit it and turn "Published" OFF.<br />
-                • <strong>Full Tab:</strong> Toggle the "Public Tab: Visible / Hidden" button at the top of that tab's page, or use the master switches in <em>Site Settings</em>!
+                • <strong>Single Item:</strong> Turn "Published" OFF.<br />
+                • <strong>Entire Tab:</strong> Toggle the "Public Tab: Visible / Hidden" button at the top of that admin page, or use <em>Site Settings</em>!
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-industrial-border text-[11px] text-amber-800 font-medium">
-              💡 Hiding preserves all your data safely while keeping it invisible to public visitors.
+              💡 Hiding preserves all database items safely while keeping them invisible to the public.
             </div>
           </div>
 
           {/* Rule 3 */}
           <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-sm flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-black text-lg mb-3">
+              <div className="w-9 h-9 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-black text-base mb-3">
                 3
               </div>
               <h3 className="font-bold text-sm text-industrial-dark mb-1.5 flex items-center gap-2">
-                <span>Seeing Your Changes</span>
+                <span>100% Uncropped Photos</span>
+                <Maximize2 className="w-4 h-4 text-purple-600" />
+              </h3>
+              <p className="text-xs text-industrial-muted leading-relaxed">
+                All photos across the website now preserve their full native aspect ratio without aggressive zooming or edge cropping.
+              </p>
+              <p className="text-xs text-industrial-dark mt-2 leading-relaxed">
+                • <strong>Admin Preview:</strong> Inspect the "Live Image Preview" box before saving.<br />
+                • <strong>Lightbox Zoom:</strong> Visitors can click any photo to inspect it full-screen.
+              </p>
+            </div>
+            <div className="mt-4 pt-3 border-t border-industrial-border text-[11px] text-purple-800 font-medium">
+              💡 Upload sharp, uncompressed photos for maximum clarity on desktop & mobile.
+            </div>
+          </div>
+
+          {/* Rule 4 */}
+          <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="w-9 h-9 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-black text-base mb-3">
+                4
+              </div>
+              <h3 className="font-bold text-sm text-industrial-dark mb-1.5 flex items-center gap-2">
+                <span>Seeing Your Live Changes</span>
                 <RefreshCw className="w-4 h-4 text-blue-600" />
               </h3>
               <p className="text-xs text-industrial-muted leading-relaxed">
-                Changes made in this admin panel save to the live database instantly.
+                Changes saved in the admin portal synchronize to the live database immediately.
               </p>
               <p className="text-xs text-industrial-dark mt-2 leading-relaxed">
-                If you open the website and still see the old text or photo, your browser has temporarily stored the old page in memory. Press <strong>Ctrl + F5</strong> (or <strong>Shift + Refresh</strong>) to load the newest version.
+                If your browser still displays an old picture or text, press <strong>Ctrl + F5</strong> (or <strong>Ctrl + Shift + R</strong>) on your keyboard to force download fresh assets.
               </p>
             </div>
             <div className="mt-4 pt-3 border-t border-industrial-border text-[11px] text-blue-800 font-medium">
-              💡 Works on Windows & Mac browsers to guarantee you view fresh data.
+              💡 Forces browsers to bypass old cached files immediately.
             </div>
           </div>
         </div>
@@ -507,7 +536,7 @@ export const AdminGuide: React.FC = () => {
             <Search className="w-4 h-4 absolute left-3 top-3 text-industrial-muted" />
             <input
               type="text"
-              placeholder="Search e.g. products, map, pdf..."
+              placeholder="Search e.g. carousel, products, pdf, map..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-white border border-industrial-border rounded-lg text-xs text-industrial-dark focus:outline-none focus:border-industrial-orange"
@@ -518,11 +547,12 @@ export const AdminGuide: React.FC = () => {
         {/* Filter Pills */}
         <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider">
           {[
-            { id: 'all', label: 'All Tabs (10)' },
-            { id: 'catalog', label: 'Products & Categories' },
-            { id: 'company', label: 'Industries, Capabilities & Projects' },
-            { id: 'content', label: 'Gallery, Documents & Blog' },
-            { id: 'settings', label: 'Contact Settings & Enquiries' },
+            { id: 'all', label: 'All Modules (11)' },
+            { id: 'overview', label: 'Overview & Enquiries' },
+            { id: 'catalog', label: 'Product Catalog' },
+            { id: 'company', label: 'Company & Projects' },
+            { id: 'media', label: 'Media & Documents' },
+            { id: 'settings', label: 'Settings & Carousel' },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -557,7 +587,7 @@ export const AdminGuide: React.FC = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-[11px] font-bold text-industrial-orange uppercase tracking-wider">
-                          Tab #{idx + 1}
+                          Module #{idx + 1}
                         </span>
                         <span className="text-gray-300">•</span>
                         <span className="text-[11px] text-gray-500 font-mono font-medium">{guide.adminPath}</span>
@@ -696,30 +726,52 @@ export const AdminGuide: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
-            <h4 className="font-bold text-industrial-dark text-sm">Where can I get image links?</h4>
+            <h4 className="font-bold text-industrial-dark text-sm">What image resolution should I use for the Hero Carousel?</h4>
             <p className="text-industrial-muted leading-relaxed">
-              When adding products or gallery items, you can use photos already uploaded on the internet, from your cloud drive (Google Drive public link, Dropbox), or free hosting services like <em>Imgur.com</em> or <em>Cloudinary</em>. Simply right-click on the image and choose <strong>"Copy Image Address"</strong>.
+              For the 5 rotating hero photos, upload landscape images with a resolution of <strong>1920×1080 (16:9)</strong> or <strong>2560×1440</strong> in JPG or WebP format. Keep file sizes under <strong>2 MB</strong> so the homepage loads at top speed on mobile devices and 4G/5G connections.
             </p>
           </div>
 
           <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
-            <h4 className="font-bold text-industrial-dark text-sm">How do I get our Google Maps link?</h4>
+            <h4 className="font-bold text-industrial-dark text-sm">How does image scaling work on Products & Gallery?</h4>
             <p className="text-industrial-muted leading-relaxed">
-              Open <strong>Google Maps</strong> on your computer, search for your factory address, click the <strong>Share</strong> button, and click <strong>"Copy link"</strong>. Paste that URL directly into the <em>Google Maps Link</em> box under <strong>Site Settings</strong>.
+              No images are cropped! Photos now render in <strong>100% full scale (`object-contain`)</strong> with ambient background styling. In the admin edit form, use the <em>Live Image Preview (100% Uncropped Scale)</em> box to inspect your picture. Website visitors can also click any photo to open the full-scale <strong>Lightbox Zoom modal</strong>.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
+            <h4 className="font-bold text-industrial-dark text-sm">How is the Homepage Hero Heading formatted?</h4>
+            <p className="text-industrial-muted leading-relaxed">
+              The headline is intentionally formatted into 3 balanced lines:
+              <br />
+              <span className="font-mono text-[11px] text-industrial-dark font-semibold">
+                1. Leading manufacturers<br />
+                2. of Bridge Bearing<br />
+                3. and HSFG Bolts
+              </span>
+              <br />
+              This ensures structural readability across smartphones, tablets, and high-resolution monitors without awkward orphan words.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
+            <h4 className="font-bold text-industrial-dark text-sm">How do I get our Google Maps share link?</h4>
+            <p className="text-industrial-muted leading-relaxed">
+              Open <strong>Google Maps</strong> on your computer, search for your factory address (Infinite Hardware Tech. Pvt. Ltd.), click the <strong>Share</strong> button, and click <strong>"Copy link"</strong>. Paste that URL directly into the <em>Google Maps Link</em> field under <strong>Site Settings</strong>.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
+            <h4 className="font-bold text-industrial-dark text-sm">How do I manage Document Center categories?</h4>
+            <p className="text-industrial-muted leading-relaxed">
+              Under <strong>Document Center</strong>, click <strong>"Manage Categories"</strong> at the top. You can add new categories (e.g. <em>"Vendor Approvals"</em>, <em>"IRC Certifications"</em>) or delete obsolete ones. If you delete a category, existing PDFs are safely reassigned without being lost.
             </p>
           </div>
 
           <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
             <h4 className="font-bold text-industrial-dark text-sm">Can customers order or pay directly on the site?</h4>
             <p className="text-industrial-muted leading-relaxed">
-              No. Infinite Hardware is a B2B heavy engineering manufacturer. All product buttons say <strong>"Request Quotation"</strong>. Customers submit their required sizes, specifications, and drawings, which arrive in your <strong>Customer Enquiries</strong> tab for your sales engineers to quote.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-lg bg-gray-50 border border-industrial-border space-y-2">
-            <h4 className="font-bold text-industrial-dark text-sm">What should I do if a change doesn't show up?</h4>
-            <p className="text-industrial-muted leading-relaxed">
-              First, check if the <strong>"Published"</strong> switch was turned ON when saving. Second, on the public website, press <strong>Ctrl + Shift + R</strong> (or <strong>Ctrl + F5</strong>) on your keyboard. This forces your browser to download the very latest updates.
+              No. Infinite Hardware is a specialized B2B heavy engineering manufacturer. All product buttons say <strong>"Request Technical Quote"</strong>. Contractors and bridge consultants submit their sizes, drawings, and required quantities, which land safely in your <strong>Customer Enquiries</strong> tab for sales engineers to price.
             </p>
           </div>
         </div>
@@ -727,3 +779,5 @@ export const AdminGuide: React.FC = () => {
     </div>
   );
 };
+
+export default AdminGuide;

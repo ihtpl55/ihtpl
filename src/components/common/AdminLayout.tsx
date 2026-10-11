@@ -70,23 +70,67 @@ export const AdminLayout: React.FC = () => {
   const currentPath = location.pathname;
 
   const isTabActive = (path: string, exact = false) => {
-    if (exact) return currentPath === path;
+    if (path.includes('tab=enquiries')) {
+      return location.pathname === '/admin' && location.search.includes('tab=enquiries');
+    }
+    if (exact) {
+      return currentPath === path && !location.search.includes('tab=enquiries');
+    }
     return currentPath.startsWith(path);
   };
 
-  const navItems = [
-    { label: 'Dashboard Home', path: '/admin', icon: LayoutDashboard, exact: true },
-    { label: 'Products & Items', path: '/admin/crud/products', icon: Package },
-    { label: 'Product Categories', path: '/admin/crud/categories', icon: FolderTree },
-    { label: 'Industries Served', path: '/admin/crud/industries', icon: Building2 },
-    { label: 'Capabilities & Services', path: '/admin/crud/capabilities', icon: Wrench },
-    { label: 'Case Studies / Projects', path: '/admin/crud/projects', icon: Briefcase },
-    { label: 'Document Center', path: '/admin/crud/documents', icon: FileText },
-    { label: 'Media Gallery', path: '/admin/crud/gallery', icon: ImageIcon },
-    { label: 'Insights & Blog', path: '/admin/crud/posts', icon: BookOpen },
-    { label: 'About & Leadership', path: '/admin/crud/about', icon: Info },
-    { label: 'Site Settings', path: '/admin/crud/settings', icon: Settings },
-    { label: 'How To Guide', path: '/admin/guide', icon: HelpCircle },
+  interface NavItem {
+    label: string;
+    path: string;
+    icon: React.ElementType;
+    exact?: boolean;
+    badge?: number;
+  }
+
+  interface NavGroup {
+    title: string;
+    items: NavItem[];
+  }
+
+  const navGroups: NavGroup[] = [
+    {
+      title: 'Overview & Leads',
+      items: [
+        { label: 'Dashboard Overview', path: '/admin', icon: LayoutDashboard, exact: true },
+        { label: 'Customer Enquiries', path: '/admin?tab=enquiries', icon: Mail, badge: newEnquiriesCount },
+      ],
+    },
+    {
+      title: 'Product Catalog',
+      items: [
+        { label: 'Products & Items', path: '/admin/crud/products', icon: Package },
+        { label: 'Product Categories', path: '/admin/crud/categories', icon: FolderTree },
+      ],
+    },
+    {
+      title: 'Company & Showcase',
+      items: [
+        { label: 'About & Leadership', path: '/admin/crud/about', icon: Info },
+        { label: 'Industries Served', path: '/admin/crud/industries', icon: Building2 },
+        { label: 'Capabilities & Plant', path: '/admin/crud/capabilities', icon: Wrench },
+        { label: 'Projects & Case Studies', path: '/admin/crud/projects', icon: Briefcase },
+      ],
+    },
+    {
+      title: 'Media & Resources',
+      items: [
+        { label: 'Document Center', path: '/admin/crud/documents', icon: FileText },
+        { label: 'Media Gallery', path: '/admin/crud/gallery', icon: ImageIcon },
+        { label: 'Industry Insights', path: '/admin/crud/posts', icon: BookOpen },
+      ],
+    },
+    {
+      title: 'System & Help',
+      items: [
+        { label: 'Site Settings', path: '/admin/crud/settings', icon: Settings },
+        { label: 'Staff How-To Guide', path: '/admin/guide', icon: HelpCircle },
+      ],
+    },
   ];
 
   return (
@@ -110,10 +154,10 @@ export const AdminLayout: React.FC = () => {
         </button>
       </div>
 
-      {/* Sidebar - Persistent on desktop */}
-      <aside className={`w-full md:w-64 bg-industrial-dark text-white p-6 shrink-0 flex flex-col justify-between z-30 transition-all duration-300 md:translate-x-0 ${mobileMenuOpen ? 'fixed inset-y-0 left-0 translate-x-0' : 'hidden md:flex'}`}>
+      {/* Sidebar - Persistent on desktop with clean scrollable structure */}
+      <aside className={`w-full md:w-64 bg-industrial-dark text-white p-5 shrink-0 flex flex-col justify-between z-30 transition-all duration-300 md:translate-x-0 max-h-screen overflow-y-auto ${mobileMenuOpen ? 'fixed inset-y-0 left-0 translate-x-0' : 'hidden md:flex'}`}>
         <div>
-          <div className="flex items-center justify-between border-b border-industrial-slate pb-4 mb-6">
+          <div className="flex items-center justify-between border-b border-industrial-slate pb-4 mb-5">
             <Link
               to="/"
               className="flex items-center space-x-3 group"
@@ -139,36 +183,39 @@ export const AdminLayout: React.FC = () => {
             </button>
           </div>
 
-          <nav className="space-y-1 text-xs font-bold uppercase tracking-wider">
-            {navItems.map((item) => {
-              const active = isTabActive(item.path, item.exact);
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center space-x-2.5 px-3 py-3 rounded transition-colors ${active ? 'bg-industrial-orange text-white' : 'text-gray-300 hover:bg-industrial-slate'}`}
-                >
-                  <item.icon className="w-4 h-4 text-industrial-orange-light shrink-0" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-
-            {/* Enquiries Button with badge */}
-            <Link
-              to="/admin?tab=enquiries"
-              className={`flex items-center justify-between px-3 py-3 rounded transition-colors ${location.search.includes('tab=enquiries') ? 'bg-industrial-orange text-white' : 'text-gray-300 hover:bg-industrial-slate'}`}
-            >
-              <div className="flex items-center space-x-2.5">
-                <Mail className="w-4 h-4 text-industrial-orange-light shrink-0" />
-                <span>Customer Enquiries</span>
+          <nav className="space-y-4 text-xs">
+            {navGroups.map((group) => (
+              <div key={group.title} className="space-y-1">
+                <div className="px-2.5 text-[10px] font-black uppercase tracking-wider text-gray-400">
+                  {group.title}
+                </div>
+                {group.items.map((item) => {
+                  const active = isTabActive(item.path, item.exact);
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center justify-between px-2.5 py-2 rounded font-bold uppercase text-[11px] tracking-wider transition-colors ${
+                        active
+                          ? 'bg-industrial-orange text-white shadow-sm'
+                          : 'text-gray-300 hover:bg-industrial-slate hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <item.icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-industrial-orange-light'}`} />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span className="bg-red-600 text-white text-[10px] px-1.5 py-0.2 rounded-full font-black ml-1.5 shrink-0">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
               </div>
-              {newEnquiriesCount > 0 && (
-                <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
-                  {newEnquiriesCount}
-                </span>
-              )}
-            </Link>
+            ))}
           </nav>
         </div>
 

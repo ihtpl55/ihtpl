@@ -87,7 +87,7 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-subtle">
               <div className="flex items-center justify-between">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-industrial-muted">Case Studies / Projects</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-industrial-muted">Projects & Case Studies</div>
                 <Briefcase className="w-5 h-5 text-industrial-orange" />
               </div>
               <div className="text-3xl font-black text-industrial-dark mt-2">{projects.length}</div>
@@ -98,7 +98,7 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-subtle">
               <div className="flex items-center justify-between">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-industrial-muted">Documents Library</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-industrial-muted">Document Center</div>
                 <FileText className="w-5 h-5 text-industrial-orange" />
               </div>
               <div className="text-3xl font-black text-industrial-dark mt-2">{documents.length}</div>
@@ -109,7 +109,7 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="bg-white p-5 rounded-lg border border-industrial-border shadow-subtle">
               <div className="flex items-center justify-between">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-industrial-muted">Enquiries Received</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-industrial-muted">Customer Enquiries</div>
                 <Mail className="w-5 h-5 text-industrial-orange" />
               </div>
               <div className="text-3xl font-black text-industrial-dark mt-2">{enquiries.length}</div>
