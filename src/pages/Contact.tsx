@@ -182,7 +182,7 @@ export const Contact: React.FC = () => {
                 <div className="text-left min-w-0">
                   <div className="text-xs font-bold text-industrial-dark flex items-center">
                     <MapPin className="w-3.5 h-3.5 text-industrial-orange mr-1.5 shrink-0" />
-                    <span>Office & Logistics Hub</span>
+                    <span>Infinite Hardware Tech. Pvt. Ltd.</span>
                   </div>
                   <div className="text-[11px] text-industrial-muted truncate max-w-xs mt-0.5">
                     {settings.address || 'Corporate Facility'}
