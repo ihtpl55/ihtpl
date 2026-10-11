@@ -182,7 +182,7 @@ export const Home: React.FC = () => {
             <div
               key={idx}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                idx === currentSlide ? 'opacity-30' : 'opacity-0 pointer-events-none'
+                idx === currentSlide ? 'opacity-70' : 'opacity-0 pointer-events-none'
               }`}
             >
               <img
@@ -194,9 +194,9 @@ export const Home: React.FC = () => {
               />
             </div>
           ))}
-          {/* Multi-layer gradient overlays ensuring strong text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-industrial-dark via-industrial-dark/90 to-industrial-dark/60" />
-          <div className="absolute inset-0 bg-radial-at-c from-transparent via-industrial-dark/20 to-industrial-dark/60 pointer-events-none" />
+          {/* Subtle directional gradient ensuring crisp text legibility on the left while keeping photos vivid on the right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-industrial-dark/90 via-industrial-dark/65 to-industrial-dark/20 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/70 via-transparent to-transparent pointer-events-none" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full">
