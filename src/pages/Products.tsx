@@ -5,6 +5,7 @@ import { getProducts } from '../services/products.service';
 import { getCategories } from '../services/categories.service';
 import { Product, Category } from '../types';
 import { ProductCardSkeleton } from '../components/common/Skeleton';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -260,8 +261,10 @@ export const Products: React.FC = () => {
                   >
                     <div className="p-4 bg-gray-50 border-b border-industrial-border relative h-48 flex items-center justify-center">
                       <img
-                        src={prod.featuredImage}
+                        src={optimizeImageUrl(prod.featuredImage, 480, 70)}
                         alt={prod.name}
+                        loading="lazy"
+                        decoding="async"
                         className="max-h-full max-w-full object-contain"
                         onError={(e) => {
                           e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product';
@@ -311,8 +314,10 @@ export const Products: React.FC = () => {
                   >
                     <div className="w-full sm:w-36 h-36 bg-gray-50 rounded border border-industrial-border p-2 shrink-0 flex items-center justify-center">
                       <img
-                        src={prod.featuredImage}
+                        src={optimizeImageUrl(prod.featuredImage, 360, 70)}
                         alt={prod.name}
+                        loading="lazy"
+                        decoding="async"
                         className="max-h-full max-w-full object-contain"
                         onError={(e) => {
                           e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product';

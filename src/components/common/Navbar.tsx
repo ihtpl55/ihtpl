@@ -89,6 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({ settings, onOpenSearch }) => {
             <img
               src="/logo.jpg"
               alt="Infinite Hardware Technology (P) Ltd."
+              decoding="async"
               className="h-12 w-auto object-contain rounded"
             />
             <div>

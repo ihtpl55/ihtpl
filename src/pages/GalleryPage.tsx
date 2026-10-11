@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, Image as ImageIcon, X } from 'lucide-react';
 import { getGalleryItems, getGalleryCategories } from '../services/gallery.service';
 import { GalleryItem, GalleryCategory } from '../types';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 
 export const GalleryPage: React.FC = () => {
   const [items, setItems] = useState<GalleryItem[]>([]);
@@ -62,16 +63,17 @@ export const GalleryPage: React.FC = () => {
               {/* Uncropped Image Display with subtle ambient backdrop */}
               <div className="relative h-60 sm:h-64 bg-neutral-900 flex items-center justify-center p-2 overflow-hidden">
                 <img
-                  src={item.image}
+                  src={optimizeImageUrl(item.image, 80, 20)}
                   alt=""
                   aria-hidden="true"
                   className="absolute inset-0 w-full h-full object-cover blur-md opacity-25 scale-110 pointer-events-none"
                 />
                 <img
-                  src={item.image}
+                  src={optimizeImageUrl(item.image, 600, 75)}
                   alt={item.title}
                   className="relative z-10 max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow"
                   loading="lazy"
+                  decoding="async"
                 />
                 <span className="absolute top-3 left-3 z-20 text-[10px] font-bold uppercase tracking-wider text-industrial-orange bg-black/75 px-2 py-0.5 rounded shadow">
                   {item.category}
@@ -120,8 +122,9 @@ export const GalleryPage: React.FC = () => {
 
               <div className="flex-1 min-h-[280px] max-h-[70vh] flex items-center justify-center p-2 sm:p-4 bg-black/95">
                 <img
-                  src={activeItem.image}
+                  src={optimizeImageUrl(activeItem.image, 1400, 80)}
                   alt={activeItem.title}
+                  decoding="async"
                   className="max-h-[66vh] max-w-full w-auto h-auto object-contain rounded"
                 />
               </div>

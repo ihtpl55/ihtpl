@@ -62,7 +62,7 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => {
         {/* Column 1: Company Profile */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center space-x-3">
-            <img src="/logo.jpg" alt="Infinite Hardware" className="h-12 w-auto bg-white p-1 rounded border border-industrial-steel object-contain" />
+            <img src="/logo.jpg" alt="Infinite Hardware" loading="lazy" decoding="async" className="h-12 w-auto bg-white p-1 rounded border border-industrial-steel object-contain" />
             <div>
               <div className="text-base font-black tracking-tight text-white">Infinite Hardware Technology (P) Ltd.</div>
               <div className="text-[10px] text-industrial-orange font-bold uppercase">Bridge Bearings • Expansion Joints • Couplings</div>

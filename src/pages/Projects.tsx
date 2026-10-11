@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, ArrowRight, Briefcase } from 'lucide-react';
 import { getProjects } from '../services/projects.service';
 import { Project } from '../types';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 
 export const Projects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -52,7 +53,13 @@ export const Projects: React.FC = () => {
             <div key={proj.id} className="bg-white rounded-lg border border-industrial-border overflow-hidden hover:shadow-industrial transition-all flex flex-col justify-between">
               <div>
                 <div className="h-48 overflow-hidden relative">
-                  <img src={proj.heroImage} alt={proj.title} className="w-full h-full object-cover" />
+                  <img
+                    src={optimizeImageUrl(proj.heroImage, 600, 70)}
+                    alt={proj.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
                   <span className="absolute top-3 right-3 bg-industrial-dark text-white text-[11px] font-bold px-2.5 py-1 rounded">
                     {proj.year}
                   </span>

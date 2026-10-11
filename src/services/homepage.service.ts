@@ -3,11 +3,11 @@ import { db, USE_DEMO_DATA, auth } from '../lib/firebase';
 import { HomepageConfig } from '../types';
 
 export const defaultHeroCarouselImages = [
-  'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85',
-  'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1600&q=85',
-  'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1600&q=85',
-  'https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1600&q=85',
-  'https://images.unsplash.com/photo-1589792923962-537704632910?auto=format&fit=crop&w=1600&q=85',
+  'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1280&q=70',
+  'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1280&q=70',
+  'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1280&q=70',
+  'https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1280&q=70',
+  'https://images.unsplash.com/photo-1589792923962-537704632910?auto=format&fit=crop&w=1280&q=70',
 ];
 
 const defaultHomepageConfig: HomepageConfig = {

@@ -18,6 +18,7 @@ import { getCapabilities } from '../services/capabilities.service';
 import { getProjects } from '../services/projects.service';
 import { getSiteSettings, getCachedSettings } from '../services/settings.service';
 import { getAboutConfig, defaultAboutConfig } from '../services/about.service';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 import {
   HomepageConfig,
   AboutConfig,
@@ -135,6 +136,15 @@ export const Home: React.FC = () => {
     }
   }, [heroImages.length, currentSlide]);
 
+  // Preload the next carousel slide in background so crossfade is instant
+  useEffect(() => {
+    if (heroImages.length > 1) {
+      const nextIdx = (currentSlide + 1) % heroImages.length;
+      const nextImg = new Image();
+      nextImg.src = optimizeImageUrl(heroImages[nextIdx], 1280, 70);
+    }
+  }, [currentSlide, heroImages]);
+
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
   };
@@ -178,22 +188,34 @@ export const Home: React.FC = () => {
       >
         {/* Background Slides with Smooth Crossfade */}
         <div className="absolute inset-0 z-0">
-          {heroImages.map((img, idx) => (
-            <div
-              key={idx}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                idx === currentSlide ? 'opacity-70' : 'opacity-0 pointer-events-none'
-              }`}
-            >
-              <img
-                src={img}
-                alt={`Hero Slide ${idx + 1}`}
-                className={`w-full h-full object-cover transition-transform duration-[7000ms] ease-out ${
-                  idx === currentSlide ? 'scale-105' : 'scale-100'
+          {heroImages.map((img, idx) => {
+            const isInitial = idx === 0;
+            const isCurrent = idx === currentSlide;
+            const isNext = idx === (currentSlide + 1) % heroImages.length;
+            const shouldRender = isInitial || isCurrent || isNext;
+
+            return (
+              <div
+                key={idx}
+                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                  isCurrent ? 'opacity-70' : 'opacity-0 pointer-events-none'
                 }`}
-              />
-            </div>
-          ))}
+              >
+                {shouldRender && (
+                  <img
+                    src={optimizeImageUrl(img, 1280, 70)}
+                    alt={`Hero Slide ${idx + 1}`}
+                    loading={isInitial ? 'eager' : 'lazy'}
+                    decoding="async"
+                    fetchPriority={isInitial ? 'high' : 'low'}
+                    className={`w-full h-full object-cover transition-transform duration-[7000ms] ease-out ${
+                      isCurrent ? 'scale-105' : 'scale-100'
+                    }`}
+                  />
+                )}
+              </div>
+            );
+          })}
           {/* Subtle directional gradient ensuring crisp text legibility on the left while keeping photos vivid on the right */}
           <div className="absolute inset-0 bg-gradient-to-r from-industrial-dark/90 via-industrial-dark/65 to-industrial-dark/20 pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/70 via-transparent to-transparent pointer-events-none" />
@@ -305,8 +327,10 @@ export const Home: React.FC = () => {
                 >
                   <div className="relative h-44 sm:h-48 overflow-hidden bg-gray-50 flex items-center justify-center p-3 sm:p-4 border-b border-industrial-border">
                     <img
-                      src={cat.image}
+                      src={optimizeImageUrl(cat.image, 480, 70)}
                       alt={cat.name}
+                      loading="lazy"
+                      decoding="async"
                       className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
@@ -374,8 +398,10 @@ export const Home: React.FC = () => {
               <div className="lg:col-span-6">
                 <div className="relative rounded-lg overflow-hidden border border-industrial-border shadow-elevated group">
                   <img
-                    src={aboutConfig.storyImage || config.companyImage || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80'}
+                    src={optimizeImageUrl(aboutConfig.storyImage || config.companyImage || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=70', 800, 70)}
                     alt="Company Facility"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-80 sm:h-96 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/60 via-transparent to-transparent"></div>
@@ -468,8 +494,10 @@ export const Home: React.FC = () => {
                   className="group relative rounded-lg overflow-hidden border border-industrial-border h-56 sm:h-64 flex items-end"
                 >
                   <img
-                    src={ind.image}
+                    src={optimizeImageUrl(ind.image, 600, 70)}
                     alt={ind.title}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark via-industrial-dark/60 to-transparent" />
@@ -517,8 +545,10 @@ export const Home: React.FC = () => {
                 >
                   <div className="p-4 bg-gray-50 border-b border-industrial-border relative h-48 sm:h-52 flex items-center justify-center">
                     <img
-                      src={prod.featuredImage}
+                      src={optimizeImageUrl(prod.featuredImage, 480, 70)}
                       alt={prod.name}
+                      loading="lazy"
+                      decoding="async"
                       className="max-h-full max-w-full object-contain"
                       onError={(e) => {
                         e.currentTarget.src = 'https://placehold.co/600x400/111315/ffffff?text=Product';
@@ -591,8 +621,10 @@ export const Home: React.FC = () => {
                   <div>
                     <div className="h-44 sm:h-48 overflow-hidden relative">
                       <img
-                        src={proj.heroImage}
+                        src={optimizeImageUrl(proj.heroImage, 600, 70)}
                         alt={proj.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                       <span className="absolute top-3 right-3 bg-industrial-dark text-white text-[11px] font-bold px-2.5 py-1 rounded">

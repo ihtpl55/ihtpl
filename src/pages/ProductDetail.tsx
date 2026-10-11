@@ -7,6 +7,7 @@ import remarkBreaks from 'remark-breaks';
 import { getProductBySlug, getProducts } from '../services/products.service';
 import { Product } from '../types';
 import { ProductDetailSkeleton } from '../components/common/Skeleton';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 
 const normalizeMarkdown = (content?: string): string => {
   if (!content) return '';
@@ -95,7 +96,7 @@ export const ProductDetail: React.FC = () => {
               className="bg-gray-50 border border-industrial-border rounded-lg p-4 sm:p-6 h-80 sm:h-96 flex items-center justify-center relative cursor-zoom-in group hover:border-industrial-orange transition-all"
               title="Click to view full-size uncropped image"
             >
-              <img src={activeImage} alt={product.name} className="max-h-full max-w-full object-contain" />
+              <img src={optimizeImageUrl(activeImage, 800, 75)} alt={product.name} decoding="async" className="max-h-full max-w-full object-contain" />
               <button
                 type="button"
                 onClick={(e) => {
@@ -118,7 +119,7 @@ export const ProductDetail: React.FC = () => {
                     onClick={() => setActiveImage(img)}
                     className={`w-20 h-20 rounded border bg-gray-50 p-1 shrink-0 ${activeImage === img ? 'border-industrial-orange border-2' : 'border-industrial-border hover:border-industrial-dark'}`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-contain" />
+                    <img src={optimizeImageUrl(img, 160, 70)} alt="" loading="lazy" decoding="async" className="w-full h-full object-contain" />
                   </button>
                 ))}
               </div>
@@ -338,8 +339,9 @@ export const ProductDetail: React.FC = () => {
 
             <div className="flex-1 min-h-[300px] max-h-[75vh] flex items-center justify-center p-2 sm:p-4 bg-black/95">
               <img
-                src={activeImage}
+                src={optimizeImageUrl(activeImage, 1400, 80)}
                 alt={product.name}
+                decoding="async"
                 className="max-h-[70vh] max-w-full w-auto h-auto object-contain rounded"
               />
             </div>

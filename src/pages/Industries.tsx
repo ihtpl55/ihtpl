@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronRight, Building2 } from 'lucide-react';
 import { getIndustries } from '../services/industries.service';
 import { Industry } from '../types';
+import { optimizeImageUrl } from '../lib/imageOptimizer';
 
 export const Industries: React.FC = () => {
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -34,7 +35,13 @@ export const Industries: React.FC = () => {
             <div key={ind.id} className="bg-white rounded-lg border border-industrial-border overflow-hidden hover:shadow-industrial transition-all flex flex-col justify-between">
               <div>
                 <div className="h-48 overflow-hidden relative">
-                  <img src={ind.image} alt={ind.title} className="w-full h-full object-cover" />
+                  <img
+                    src={optimizeImageUrl(ind.image, 600, 70)}
+                    alt={ind.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <h2 className="text-xl font-bold text-industrial-dark mb-2">{ind.title}</h2>
