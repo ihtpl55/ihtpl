@@ -143,6 +143,28 @@ export const Home: React.FC = () => {
     setCurrentSlide((prev) => (prev + 1) % heroImages.length);
   };
 
+  const renderHeroHeading = (heading?: string) => {
+    if (!heading) return null;
+    const normalized = heading.replace(/\s+/g, ' ').trim();
+    if (normalized === 'Leading manufacturers of Bridge Bearing and HSFG Bolts') {
+      return (
+        <>
+          <span className="block">Leading manufacturers</span>
+          <span className="block">of Bridge Bearing</span>
+          <span className="block">and HSFG Bolts</span>
+        </>
+      );
+    }
+    if (heading.includes('\n')) {
+      return heading.split('\n').map((line, idx) => (
+        <span key={idx} className="block">
+          {line}
+        </span>
+      ));
+    }
+    return heading;
+  };
+
   return (
     <div className="bg-white text-industrial-dark font-sans">
       {/* Hero Carousel */}
@@ -182,7 +204,7 @@ export const Home: React.FC = () => {
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-4 sm:mb-6">
-              {config.heroHeading}
+              {renderHeroHeading(config.heroHeading)}
             </h1>
 
             <p className="text-base sm:text-xl text-gray-300 font-normal leading-relaxed mb-6 sm:mb-8 max-w-2xl">
