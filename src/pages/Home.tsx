@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import {
   ArrowRight,
   ShieldCheck,
@@ -9,8 +9,9 @@ import {
   ChevronLeft,
   FileText,
   Award,
+  ExternalLink,
 } from 'lucide-react';
-import { getHomepageConfig, defaultHeroCarouselImages } from '../services/homepage.service';
+import { getHomepageConfig, defaultHeroCarouselImages, defaultHeroCarouselLinks } from '../services/homepage.service';
 import { getCategories } from '../services/categories.service';
 import { getProducts } from '../services/products.service';
 import { getIndustries } from '../services/industries.service';
@@ -55,6 +56,7 @@ const defaultHomepageConfig: HomepageConfig = {
 };
 
 export const Home: React.FC = () => {
+  const navigate = useNavigate();
   const outlet = useOutletContext<{ settings?: SiteSettings }>();
   const [config, setConfig] = useState<HomepageConfig>(defaultHomepageConfig);
   const [aboutConfig, setAboutConfig] = useState<AboutConfig>(defaultAboutConfig);
@@ -117,8 +119,32 @@ export const Home: React.FC = () => {
     return defaultHeroCarouselImages;
   }, [effectiveSettings?.heroCarouselImages, config.heroImages]);
 
+  const heroLinks = useMemo(() => {
+    if (effectiveSettings?.heroCarouselLinks && effectiveSettings.heroCarouselLinks.length > 0) {
+      return effectiveSettings.heroCarouselLinks;
+    }
+    if (config.heroLinks && config.heroLinks.length > 0) {
+      return config.heroLinks;
+    }
+    return defaultHeroCarouselLinks;
+  }, [effectiveSettings?.heroCarouselLinks, config.heroLinks]);
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+
+  const currentSlideLink = heroLinks[currentSlide]?.trim() || '';
+  const hasSlideLink = Boolean(currentSlideLink);
+  const isExternalSlideLink =
+    currentSlideLink.startsWith('http://') || currentSlideLink.startsWith('https://');
+
+  const handleSlideRedirect = () => {
+    if (!hasSlideLink) return;
+    if (isExternalSlideLink) {
+      window.open(currentSlideLink, '_blank', 'noopener,noreferrer');
+    } else {
+      navigate(currentSlideLink);
+    }
+  };
 
   // Auto-advance carousel every 5 seconds
   useEffect(() => {
@@ -182,9 +208,16 @@ export const Home: React.FC = () => {
     <div className="bg-white text-industrial-dark font-sans">
       {/* Hero Carousel */}
       <section
-        className="relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate min-h-[520px] sm:min-h-[580px] flex items-center"
+        className={`relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate min-h-[520px] sm:min-h-[580px] flex items-center ${
+          hasSlideLink ? 'cursor-pointer' : ''
+        }`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
+        onClick={() => {
+          if (hasSlideLink) {
+            handleSlideRedirect();
+          }
+        }}
       >
         {/* Background Slides with Smooth Crossfade */}
         <div className="absolute inset-0 z-0">
@@ -221,8 +254,30 @@ export const Home: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/70 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full">
-          <div className="max-w-3xl">
+        {/* Optional floating link indicator badge when slide is linked */}
+        {hasSlideLink && (
+          <div
+            className="absolute top-5 right-5 sm:top-8 sm:right-8 z-20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={handleSlideRedirect}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-industrial-dark/80 hover:bg-industrial-orange text-white text-xs font-semibold backdrop-blur-md border border-industrial-steel transition-colors shadow-elevated cursor-pointer group"
+              title={isExternalSlideLink ? `Open external link: ${currentSlideLink}` : `Go to ${currentSlideLink}`}
+            >
+              <span>View Slide Details</span>
+              {isExternalSlideLink ? (
+                <ExternalLink className="w-3.5 h-3.5 text-industrial-orange group-hover:text-white transition-colors" />
+              ) : (
+                <ArrowRight className="w-3.5 h-3.5 text-industrial-orange group-hover:text-white transition-colors" />
+              )}
+            </button>
+          </div>
+        )}
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full pointer-events-none">
+          <div className="max-w-3xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
               <ShieldCheck className="w-4 h-4 text-industrial-orange" />
               <span>{config.heroEyebrow}</span>
@@ -258,7 +313,10 @@ export const Home: React.FC = () => {
 
         {/* Carousel Indicators & Controls */}
         {heroImages.length > 1 && (
-          <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 z-20 flex items-center space-x-2.5 bg-industrial-dark/80 backdrop-blur-md px-3.5 py-2 rounded-full border border-industrial-steel shadow-elevated">
+          <div
+            className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 z-20 flex items-center space-x-2.5 bg-industrial-dark/80 backdrop-blur-md px-3.5 py-2 rounded-full border border-industrial-steel shadow-elevated"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={handlePrevSlide}

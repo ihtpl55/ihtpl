@@ -27,6 +27,7 @@ export const initialSiteSettings: SiteSettings = {
   businessHours: 'Monday – Saturday: 9:00 AM – 6:00 PM',
   footerDescription: 'Infinite Hardware Technology (P) Ltd. is a supplier of bridge bearings, expansion joints, couplings, fasteners, and industrial hardware.',
   copyrightText: '© 2026 Infinite Hardware Technology (P) Ltd. All rights reserved.',
+  heroCarouselLinks: ['/products', '/capabilities', '/documents', '/projects', '/contact'],
 };
 
 export const initialHomepageConfig: HomepageConfig = {
@@ -34,6 +35,7 @@ export const initialHomepageConfig: HomepageConfig = {
   heroHeading: 'Leading manufacturers of Bridge bearings and HSFG Bolts',
   heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=1600&q=85',
+  heroLinks: ['/products', '/capabilities', '/documents', '/projects', '/contact'],
   primaryCtaText: 'View Products',
   primaryCtaLink: '/products',
   secondaryCtaText: 'Contact Us',

@@ -10,12 +10,21 @@ export const defaultHeroCarouselImages = [
   'https://images.unsplash.com/photo-1589792923962-537704632910?auto=format&fit=crop&w=1280&q=70',
 ];
 
+export const defaultHeroCarouselLinks = [
+  '/products',
+  '/capabilities',
+  '/documents',
+  '/projects',
+  '/contact',
+];
+
 const defaultHomepageConfig: HomepageConfig = {
   heroEyebrow: "ENGINEERING INDIA'S INFRASTRUCTURE",
   heroHeading: 'Leading manufacturers of Bridge bearings and HSFG Bolts',
   heroDescription: "Precision-manufactured solutions powering India's infrastructure ambitions.",
   heroImage: defaultHeroCarouselImages[0],
   heroImages: defaultHeroCarouselImages,
+  heroLinks: defaultHeroCarouselLinks,
   primaryCtaText: 'Explore Product Catalog',
   primaryCtaLink: '/products',
   secondaryCtaText: 'Request Technical Quote',
@@ -54,6 +63,10 @@ export const getHomepageConfig = async (): Promise<HomepageConfig> => {
         data.heroImages && data.heroImages.length > 0
           ? data.heroImages
           : defaultHeroCarouselImages,
+      heroLinks:
+        data.heroLinks && Array.isArray(data.heroLinks) && data.heroLinks.length > 0
+          ? data.heroLinks
+          : defaultHeroCarouselLinks,
       heroEyebrow:
         !data.heroEyebrow ||
         data.heroEyebrow === 'HARDWARE & INDUSTRIAL SUPPLIES' ||

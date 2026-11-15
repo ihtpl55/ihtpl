@@ -187,6 +187,7 @@ export interface SiteSettings {
   copyrightText: string;
   navVisibility?: NavigationVisibility;
   heroCarouselImages?: string[];
+  heroCarouselLinks?: string[];
 }
 
 export interface TrustMetric {
@@ -201,6 +202,7 @@ export interface HomepageConfig {
   heroDescription: string;
   heroImage: string;
   heroImages?: string[];
+  heroLinks?: string[];
   primaryCtaText: string;
   primaryCtaLink: string;
   secondaryCtaText: string;

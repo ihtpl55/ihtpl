@@ -30,6 +30,7 @@ import {
   Sparkles,
   UserPlus,
   ShieldCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { getProducts, saveProduct, deleteProduct } from '../services/products.service';
 import { getCategories, saveCategory, deleteCategory } from '../services/categories.service';
@@ -43,7 +44,7 @@ import { getCertifications, saveCertification, deleteCertification } from '../se
 import { getPosts, savePost, deletePost } from '../services/posts.service';
 import { getSiteSettings, updateSiteSettings } from '../services/settings.service';
 import { getAboutConfig, updateAboutConfig, defaultAboutConfig } from '../services/about.service';
-import { defaultHeroCarouselImages } from '../services/homepage.service';
+import { defaultHeroCarouselImages, defaultHeroCarouselLinks } from '../services/homepage.service';
 import { uploadFile } from '../services/storage.service';
 import { Product, Category, Brand, Project, SiteSettings, NavigationVisibility, Industry, Capability, GalleryItem, Certification, BlogPost, AboutConfig, CoreValue, LeadershipMember } from '../types';
 
@@ -626,7 +627,7 @@ export const AdminCRUD: React.FC = () => {
                     <span>Homepage Hero Carousel (5 Rotating Photos)</span>
                   </h3>
                   <p className="text-[11px] text-industrial-muted mt-0.5">
-                    Customize the 5 rotating background photos for the homepage hero carousel. You can upload files or paste image URLs.
+                    Customize the 5 rotating background photos for the homepage hero carousel and optionally assign click redirect links (internal page or external website) to each photo.
                   </p>
                 </div>
                 <button
@@ -635,6 +636,7 @@ export const AdminCRUD: React.FC = () => {
                     setSettingsItem({
                       ...settingsItem,
                       heroCarouselImages: defaultHeroCarouselImages,
+                      heroCarouselLinks: defaultHeroCarouselLinks,
                     })
                   }
                   className="text-[10px] text-industrial-muted hover:text-industrial-orange underline font-semibold self-start sm:self-auto cursor-pointer"
@@ -645,8 +647,10 @@ export const AdminCRUD: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {[0, 1, 2, 3, 4].map((slotIdx) => {
-                  const currentList = settingsItem.heroCarouselImages || defaultHeroCarouselImages;
-                  const slideUrl = currentList[slotIdx] || '';
+                  const currentImages = settingsItem.heroCarouselImages || defaultHeroCarouselImages;
+                  const currentLinks = settingsItem.heroCarouselLinks || defaultHeroCarouselLinks;
+                  const slideUrl = currentImages[slotIdx] || '';
+                  const slideLink = currentLinks[slotIdx] || '';
                   return (
                     <div
                       key={slotIdx}
@@ -656,11 +660,18 @@ export const AdminCRUD: React.FC = () => {
                         <span className="text-[11px] font-bold text-industrial-dark uppercase tracking-wider">
                           Slide #{slotIdx + 1}
                         </span>
-                        {slideUrl && (
-                          <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
-                            Active
-                          </span>
-                        )}
+                        <div className="flex items-center space-x-1">
+                          {slideLink && (
+                            <span className="text-[8px] bg-blue-100 text-blue-800 font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5" title={`Redirects to: ${slideLink}`}>
+                              <ExternalLink className="w-2 h-2" /> Linked
+                            </span>
+                          )}
+                          {slideUrl && (
+                            <span className="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                              Active
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {/* Thumbnail preview */}
@@ -707,17 +718,44 @@ export const AdminCRUD: React.FC = () => {
                       </label>
 
                       {/* Direct URL input */}
-                      <input
-                        type="text"
-                        placeholder="Image URL..."
-                        value={slideUrl}
-                        onChange={(e) => {
-                          const updated = [...(settingsItem.heroCarouselImages || defaultHeroCarouselImages)];
-                          updated[slotIdx] = e.target.value;
-                          setSettingsItem({ ...settingsItem, heroCarouselImages: updated });
-                        }}
-                        className="w-full px-2 py-1 bg-white border border-industrial-border rounded text-[10px] font-mono focus:outline-none focus:border-industrial-orange"
-                      />
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase text-gray-500 mb-0.5">Image Source</label>
+                        <input
+                          type="text"
+                          placeholder="Image URL..."
+                          value={slideUrl}
+                          onChange={(e) => {
+                            const updated = [...(settingsItem.heroCarouselImages || defaultHeroCarouselImages)];
+                            updated[slotIdx] = e.target.value;
+                            setSettingsItem({ ...settingsItem, heroCarouselImages: updated });
+                          }}
+                          className="w-full px-2 py-1 bg-white border border-industrial-border rounded text-[10px] font-mono focus:outline-none focus:border-industrial-orange"
+                        />
+                      </div>
+
+                      {/* Click Redirect Link */}
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase text-gray-500 mb-0.5 flex items-center justify-between">
+                          <span className="flex items-center gap-1">
+                            <ExternalLink className="w-2.5 h-2.5 text-industrial-orange" />
+                            Click Redirect Link
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. /products or https://..."
+                          value={slideLink}
+                          onChange={(e) => {
+                            const updatedLinks = [...(settingsItem.heroCarouselLinks || defaultHeroCarouselLinks)];
+                            updatedLinks[slotIdx] = e.target.value;
+                            setSettingsItem({ ...settingsItem, heroCarouselLinks: updatedLinks });
+                          }}
+                          className="w-full px-2 py-1 bg-white border border-industrial-border rounded text-[10px] font-mono focus:outline-none focus:border-industrial-orange"
+                        />
+                        <span className="text-[8px] text-gray-400 block mt-0.5">
+                          Internal (e.g. <code className="text-gray-600">/products</code>) or External (<code className="text-gray-600">https://...</code>)
+                        </span>
+                      </div>
                     </div>
                   );
                 })}

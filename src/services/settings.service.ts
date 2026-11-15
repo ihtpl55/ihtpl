@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db, USE_DEMO_DATA } from '../lib/firebase';
 import { NavigationVisibility, SiteSettings } from '../types';
-import { defaultHeroCarouselImages } from './homepage.service';
+import { defaultHeroCarouselImages, defaultHeroCarouselLinks } from './homepage.service';
 
 export const defaultNavVisibility: NavigationVisibility = {
   products: true,
@@ -30,6 +30,7 @@ const emptySettings: SiteSettings = {
   copyrightText: '© ' + new Date().getFullYear() + ' Infinite Hardware Technology (P) Ltd. All rights reserved.',
   navVisibility: defaultNavVisibility,
   heroCarouselImages: defaultHeroCarouselImages,
+  heroCarouselLinks: defaultHeroCarouselLinks,
 };
 
 const STORAGE_KEY = 'infinite_site_settings_cache';
@@ -48,6 +49,10 @@ export const getCachedSettings = (): SiteSettings => {
             parsed.heroCarouselImages && parsed.heroCarouselImages.length > 0
               ? parsed.heroCarouselImages
               : defaultHeroCarouselImages,
+          heroCarouselLinks:
+            parsed.heroCarouselLinks && Array.isArray(parsed.heroCarouselLinks) && parsed.heroCarouselLinks.length > 0
+              ? parsed.heroCarouselLinks
+              : defaultHeroCarouselLinks,
           navVisibility: {
             ...defaultNavVisibility,
             ...(parsed.navVisibility || {}),
@@ -92,6 +97,14 @@ export const getSiteSettings = async (forceFresh = false): Promise<SiteSettings>
           const normalized: SiteSettings = {
             ...emptySettings,
             ...freshData,
+            heroCarouselImages:
+              freshData.heroCarouselImages && freshData.heroCarouselImages.length > 0
+                ? freshData.heroCarouselImages
+                : defaultHeroCarouselImages,
+            heroCarouselLinks:
+              freshData.heroCarouselLinks && Array.isArray(freshData.heroCarouselLinks) && freshData.heroCarouselLinks.length > 0
+                ? freshData.heroCarouselLinks
+                : defaultHeroCarouselLinks,
             navVisibility: {
               ...defaultNavVisibility,
               ...(freshData.navVisibility || {}),
@@ -116,6 +129,14 @@ export const getSiteSettings = async (forceFresh = false): Promise<SiteSettings>
       const normalized: SiteSettings = {
         ...emptySettings,
         ...freshData,
+        heroCarouselImages:
+          freshData.heroCarouselImages && freshData.heroCarouselImages.length > 0
+            ? freshData.heroCarouselImages
+            : defaultHeroCarouselImages,
+        heroCarouselLinks:
+          freshData.heroCarouselLinks && Array.isArray(freshData.heroCarouselLinks) && freshData.heroCarouselLinks.length > 0
+            ? freshData.heroCarouselLinks
+            : defaultHeroCarouselLinks,
         navVisibility: {
           ...defaultNavVisibility,
           ...(freshData.navVisibility || {}),
