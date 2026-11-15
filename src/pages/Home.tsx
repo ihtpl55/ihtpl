@@ -355,86 +355,78 @@ export const Home: React.FC = () => {
         )}
       </section>
 
-      {/* Beyond Hardware: Infinite Fusion Works (IFWPL) Feature Sub-Section */}
-      <section className="bg-white border-b border-industrial-border py-10 sm:py-14 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-industrial-slate via-slate-900 to-industrial-dark rounded-2xl p-6 sm:p-10 lg:p-12 text-white border border-industrial-steel/40 shadow-elevated relative overflow-hidden">
-            {/* Background decorative industrial ambient glow */}
-            <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-industrial-orange/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Beyond Hardware: Infinite Fusion Works (IFWPL) Feature Section (Carousel-Style Full Bleed) */}
+      <section
+        className="relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate min-h-[500px] sm:min-h-[540px] flex items-center cursor-pointer group"
+        onClick={() => window.open('https://ifwpl.com', '_blank', 'noopener,noreferrer')}
+      >
+        {/* Full-bleed Background Image of IFWPL Facility */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/ifwpl-facility.jpg"
+            alt="Infinite Fusion Works Pvt. Ltd. (IFWPL) - Structural Steel Fabrication Yard"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-[7000ms] ease-out opacity-75"
+          />
+          {/* Directional gradients: ensures crisp contrast for text on the left, while showcasing the yellow crane and steel girder on the right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-industrial-dark/95 via-industrial-dark/80 to-industrial-dark/30 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/80 via-transparent to-industrial-dark/30 pointer-events-none" />
+        </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center relative z-10">
-              <div className="lg:col-span-8 space-y-4 sm:space-y-5">
-                <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-white/10 border border-white/15 text-industrial-orange text-xs font-bold uppercase tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5 text-industrial-orange" />
-                  <span>Sister Company &amp; Advanced Fabrication</span>
-                </div>
+        {/* Top-Right Direct Website Pill */}
+        <div
+          className="absolute top-5 right-5 sm:top-8 sm:right-8 z-20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <a
+            href="https://ifwpl.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-industrial-dark/85 hover:bg-industrial-orange text-white text-xs font-semibold backdrop-blur-md border border-industrial-steel transition-colors shadow-elevated cursor-pointer group/link"
+            title="Open ifwpl.com in new tab"
+          >
+            <span>Visit ifwpl.com</span>
+            <ExternalLink className="w-3.5 h-3.5 text-industrial-orange group-hover/link:text-white transition-colors" />
+          </a>
+        </div>
 
-                <div>
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
-                    Our Expertise Goes Beyond Hardware
-                  </h2>
-                  <p className="text-base sm:text-lg font-semibold text-industrial-orange mt-2">
-                    Discover our capabilities in structural steel fabrication.
-                  </p>
-                </div>
+        {/* Main Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 w-full pointer-events-none">
+          <div className="max-w-3xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+            {/* Eyebrow badge */}
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
+              <Sparkles className="w-4 h-4 text-industrial-orange" />
+              <span>INFINITE FUSION WORKS (IFWPL) • STRUCTURAL STEEL FABRICATION</span>
+            </div>
 
-                <p className="text-sm sm:text-base text-gray-300 font-normal leading-relaxed max-w-3xl">
-                  Our engineering capabilities extend beyond specialized hardware manufacturing. Since 2021, Infinite Fusion Works Pvt. Ltd. (IFWPL) has been strengthening our presence in structural steel fabrication, delivering solutions for bridges, infrastructure and industrial projects. With technical expertise, modern manufacturing facilities and a commitment to precision and quality, we continue to expand our engineering capabilities.
-                </p>
+            {/* Headings */}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight mb-3 sm:mb-4">
+              Our Expertise Goes Beyond Hardware
+            </h2>
+            <p className="text-lg sm:text-xl font-bold text-industrial-orange mb-4 sm:mb-6 leading-snug">
+              Discover our capabilities in structural steel fabrication.
+            </p>
 
-                <div className="pt-2">
-                  <a
-                    href="https://ifwpl.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center px-6 py-3.5 rounded text-sm sm:text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md group cursor-pointer"
-                  >
-                    <span>Visit ifwpl.com</span>
-                    <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </a>
-                </div>
-              </div>
+            {/* Description */}
+            <p className="text-base sm:text-lg text-gray-300 font-normal leading-relaxed mb-6 sm:mb-8 max-w-2xl">
+              Our engineering capabilities extend beyond specialized hardware manufacturing. Since 2021, Infinite Fusion Works Pvt. Ltd. (IFWPL) has been strengthening our presence in structural steel fabrication, delivering solutions for bridges, infrastructure and industrial projects. With technical expertise, modern manufacturing facilities and a commitment to precision and quality, we continue to expand our engineering capabilities.
+            </p>
 
-              {/* Right column: IFWPL Highlights Badge Card */}
-              <div className="lg:col-span-4">
-                <div className="bg-white/5 backdrop-blur-md rounded-xl p-5 sm:p-6 border border-white/10 space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div>
-                      <div className="text-[11px] font-bold text-industrial-orange uppercase tracking-wider">Group Company</div>
-                      <div className="text-base font-bold text-white">Infinite Fusion Works</div>
-                      <div className="text-[11px] text-gray-400">Pvt. Ltd. (IFWPL)</div>
-                    </div>
-                    <span className="text-[10px] bg-industrial-orange/20 text-industrial-orange border border-industrial-orange/30 font-bold px-2 py-0.5 rounded">
-                      Since 2021
-                    </span>
-                  </div>
-
-                  <div className="space-y-2.5 text-xs text-gray-300">
-                    <div className="flex items-start space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-industrial-orange shrink-0 mt-0.5" />
-                      <span>Structural steel fabrication for bridges &amp; civil infrastructure</span>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-industrial-orange shrink-0 mt-0.5" />
-                      <span>Heavy industrial engineering &amp; specialized steel assemblies</span>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <CheckCircle2 className="w-4 h-4 text-industrial-orange shrink-0 mt-0.5" />
-                      <span>Modern manufacturing plant adhering to high-tolerance standards</span>
-                    </div>
-                  </div>
-
-                  <a
-                    href="https://ifwpl.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 px-3 bg-white/10 hover:bg-white/15 text-white text-xs font-bold rounded flex items-center justify-between border border-white/15 transition-colors group cursor-pointer"
-                  >
-                    <span className="text-gray-200">Explore Steel Fabrication</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-industrial-orange group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </a>
-                </div>
-              </div>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <a
+                href="https://ifwpl.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md min-h-[44px] group/btn cursor-pointer"
+              >
+                <span>Visit ifwpl.com</span>
+                <ExternalLink className="w-5 h-5 ml-2 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+              </a>
+              <span className="inline-flex items-center justify-center px-4 py-3 text-xs sm:text-sm font-semibold text-gray-300 border border-white/10 rounded bg-white/5 backdrop-blur-xs">
+                Since 2021 • Bridge Girders &amp; Infrastructure
+              </span>
             </div>
           </div>
         </div>
