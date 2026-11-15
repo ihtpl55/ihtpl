@@ -255,28 +255,6 @@ export const Home: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/70 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        {/* Optional floating link indicator badge when slide is linked */}
-        {hasSlideLink && (
-          <div
-            className="absolute top-5 right-5 sm:top-8 sm:right-8 z-20"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={handleSlideRedirect}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-industrial-dark/80 hover:bg-industrial-orange text-white text-xs font-semibold backdrop-blur-md border border-industrial-steel transition-colors shadow-elevated cursor-pointer group"
-              title={isExternalSlideLink ? `Open external link: ${currentSlideLink}` : `Go to ${currentSlideLink}`}
-            >
-              <span>View Slide Details</span>
-              {isExternalSlideLink ? (
-                <ExternalLink className="w-3.5 h-3.5 text-industrial-orange group-hover:text-white transition-colors" />
-              ) : (
-                <ArrowRight className="w-3.5 h-3.5 text-industrial-orange group-hover:text-white transition-colors" />
-              )}
-            </button>
-          </div>
-        )}
-
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full pointer-events-none">
           <div className="max-w-3xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">

@@ -357,7 +357,7 @@ export const AdminGuide: React.FC = () => {
       ],
       liveEffects: [
         'The homepage hero cycles through your 5 photos every 5 seconds with gentle crossfade and pause on hover.',
-        'Clicking any linked photo or its "View Slide Details" badge takes the visitor directly to that target page or website.',
+        'Clicking any linked photo takes the visitor directly to that target page or website.',
         'Instantly adds or removes entire tabs from the top header navigation, mobile drawer, and footer.',
         'If a tab is hidden, visitors who type its URL directly are smoothly redirected home.',
         'Instantly updates phone & email in the header, footer, and contact page.',
