@@ -136,8 +136,8 @@ export const Home: React.FC = () => {
       image: '/ifwpl-facility.jpg',
       isIfwpl: true,
       eyebrow: '',
-      heading: 'Our Expertise Goes Beyond Hardware',
-      subheading: 'Discover our capabilities in structural steel fabrication.',
+      heading: 'Beyond Hardware: Discover Our Steel Fabrication Expertise',
+      subheading: '',
       description:
         'Our engineering capabilities extend beyond specialized hardware manufacturing. Since 2021, Infinite Fusion Works Pvt. Ltd. (IFWPL) has been strengthening our presence in structural steel fabrication, delivering solutions for bridges, infrastructure and industrial projects. With technical expertise, modern manufacturing facilities and a commitment to precision and quality, we continue to expand our engineering capabilities.',
       primaryCtaText: 'Explore IFWPL',
@@ -304,9 +304,9 @@ export const Home: React.FC = () => {
               </div>
             ) : null}
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-3 sm:mb-4">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-4 sm:mb-6">
               {activeSlide.isIfwpl ? (
-                <span>Our Expertise Goes Beyond Hardware</span>
+                <span>Beyond Hardware: Discover Our Steel Fabrication Expertise</span>
               ) : (
                 renderHeroHeading(activeSlide.heading)
               )}
