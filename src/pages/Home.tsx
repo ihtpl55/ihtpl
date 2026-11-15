@@ -135,16 +135,16 @@ export const Home: React.FC = () => {
     const ifwplSlide = {
       image: '/ifwpl-facility.jpg',
       isIfwpl: true,
-      eyebrow: 'INFINITE FUSION WORKS (IFWPL) • STRUCTURAL STEEL FABRICATION',
+      eyebrow: '',
       heading: 'Our Expertise Goes Beyond Hardware',
       subheading: 'Discover our capabilities in structural steel fabrication.',
       description:
         'Our engineering capabilities extend beyond specialized hardware manufacturing. Since 2021, Infinite Fusion Works Pvt. Ltd. (IFWPL) has been strengthening our presence in structural steel fabrication, delivering solutions for bridges, infrastructure and industrial projects. With technical expertise, modern manufacturing facilities and a commitment to precision and quality, we continue to expand our engineering capabilities.',
-      primaryCtaText: 'Visit ifwpl.com',
+      primaryCtaText: 'Explore IFWPL',
       primaryCtaLink: 'https://ifwpl.com',
       isExternal: true,
-      secondaryCtaText: 'Explore Hardware Catalog',
-      secondaryCtaLink: '/products',
+      secondaryCtaText: '',
+      secondaryCtaLink: '',
       redirectUrl: 'https://ifwpl.com',
     };
 
@@ -297,14 +297,12 @@ export const Home: React.FC = () => {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full pointer-events-none">
           <div className="max-w-3xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
-              {activeSlide.isIfwpl ? (
-                <Sparkles className="w-4 h-4 text-industrial-orange" />
-              ) : (
+            {activeSlide.eyebrow ? (
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
                 <ShieldCheck className="w-4 h-4 text-industrial-orange" />
-              )}
-              <span>{activeSlide.eyebrow}</span>
-            </div>
+                <span>{activeSlide.eyebrow}</span>
+              </div>
+            ) : null}
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-3 sm:mb-4">
               {activeSlide.isIfwpl ? (
@@ -333,7 +331,7 @@ export const Home: React.FC = () => {
                   className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md min-h-[44px] cursor-pointer group"
                 >
                   <span>{activeSlide.primaryCtaText}</span>
-                  <ExternalLink className="w-5 h-5 ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </a>
               ) : (
                 <Link
@@ -345,22 +343,13 @@ export const Home: React.FC = () => {
                 </Link>
               )}
 
-              {activeSlide.isIfwpl ? (
+              {!activeSlide.isIfwpl && showContact && activeSlide.secondaryCtaLink === '/contact' && (
                 <Link
-                  to="/products"
+                  to="/contact"
                   className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-slate hover:bg-industrial-steel border border-industrial-steel transition-all min-h-[44px]"
                 >
-                  <span>Explore Hardware Catalog</span>
+                  <span>{activeSlide.secondaryCtaText}</span>
                 </Link>
-              ) : (
-                showContact && activeSlide.secondaryCtaLink === '/contact' && (
-                  <Link
-                    to="/contact"
-                    className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-slate hover:bg-industrial-steel border border-industrial-steel transition-all min-h-[44px]"
-                  >
-                    <span>{activeSlide.secondaryCtaText}</span>
-                  </Link>
-                )
               )}
             </div>
           </div>
