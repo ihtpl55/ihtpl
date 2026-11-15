@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate, useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import {
   ArrowRight,
   ShieldCheck,
@@ -9,10 +9,9 @@ import {
   ChevronLeft,
   FileText,
   Award,
-  ExternalLink,
   Sparkles,
 } from 'lucide-react';
-import { getHomepageConfig, defaultHeroCarouselImages, defaultHeroCarouselLinks } from '../services/homepage.service';
+import { getHomepageConfig, defaultHeroCarouselImages } from '../services/homepage.service';
 import { getCategories } from '../services/categories.service';
 import { getProducts } from '../services/products.service';
 import { getIndustries } from '../services/industries.service';
@@ -57,7 +56,6 @@ const defaultHomepageConfig: HomepageConfig = {
 };
 
 export const Home: React.FC = () => {
-  const navigate = useNavigate();
   const outlet = useOutletContext<{ settings?: SiteSettings }>();
   const [config, setConfig] = useState<HomepageConfig>(defaultHomepageConfig);
   const [aboutConfig, setAboutConfig] = useState<AboutConfig>(defaultAboutConfig);
@@ -120,16 +118,6 @@ export const Home: React.FC = () => {
     return defaultHeroCarouselImages;
   }, [effectiveSettings?.heroCarouselImages, config.heroImages]);
 
-  const heroLinks = useMemo(() => {
-    if (effectiveSettings?.heroCarouselLinks && effectiveSettings.heroCarouselLinks.length > 0) {
-      return effectiveSettings.heroCarouselLinks;
-    }
-    if (config.heroLinks && config.heroLinks.length > 0) {
-      return config.heroLinks;
-    }
-    return defaultHeroCarouselLinks;
-  }, [effectiveSettings?.heroCarouselLinks, config.heroLinks]);
-
   // Slide 0 is the static IFWPL sister company showcase, followed by the dynamic CMS hardware slides
   const carouselSlides = useMemo(() => {
     const ifwplSlide = {
@@ -145,10 +133,9 @@ export const Home: React.FC = () => {
       isExternal: true,
       secondaryCtaText: '',
       secondaryCtaLink: '',
-      redirectUrl: 'https://ifwpl.com',
     };
 
-    const dynamicSlides = heroImages.map((img, idx) => ({
+    const dynamicSlides = heroImages.map((img) => ({
       image: img,
       isIfwpl: false,
       eyebrow: config.heroEyebrow,
@@ -160,28 +147,15 @@ export const Home: React.FC = () => {
       isExternal: false,
       secondaryCtaText: config.secondaryCtaText,
       secondaryCtaLink: config.secondaryCtaLink,
-      redirectUrl: heroLinks[idx]?.trim() || '',
     }));
 
     return [ifwplSlide, ...dynamicSlides];
-  }, [heroImages, heroLinks, config]);
+  }, [heroImages, config]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   const activeSlide = carouselSlides[currentSlide] || carouselSlides[0];
-  const hasSlideLink = Boolean(activeSlide.redirectUrl);
-  const isExternalSlideLink =
-    activeSlide.redirectUrl.startsWith('http://') || activeSlide.redirectUrl.startsWith('https://');
-
-  const handleSlideRedirect = () => {
-    if (!hasSlideLink) return;
-    if (isExternalSlideLink) {
-      window.open(activeSlide.redirectUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      navigate(activeSlide.redirectUrl);
-    }
-  };
 
   // Auto-advance carousel every 5 seconds
   useEffect(() => {
@@ -246,16 +220,9 @@ export const Home: React.FC = () => {
     <div className="bg-white text-industrial-dark font-sans">
       {/* Hero Carousel */}
       <section
-        className={`relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate min-h-[520px] sm:min-h-[580px] flex items-center ${
-          hasSlideLink ? 'cursor-pointer' : ''
-        }`}
+        className="relative bg-industrial-dark text-white overflow-hidden border-b border-industrial-slate min-h-[520px] sm:min-h-[580px] flex items-center"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        onClick={() => {
-          if (hasSlideLink) {
-            handleSlideRedirect();
-          }
-        }}
       >
         {/* Background Slides with Smooth Crossfade */}
         <div className="absolute inset-0 z-0">
@@ -295,8 +262,8 @@ export const Home: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/70 via-transparent to-transparent pointer-events-none" />
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full pointer-events-none">
-          <div className="max-w-3xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full">
+          <div className="max-w-3xl">
             {activeSlide.eyebrow ? (
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
                 <ShieldCheck className="w-4 h-4 text-industrial-orange" />
@@ -357,10 +324,7 @@ export const Home: React.FC = () => {
 
         {/* Carousel Indicators & Controls */}
         {carouselSlides.length > 1 && (
-          <div
-            className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 z-20 flex items-center space-x-2.5 bg-industrial-dark/80 backdrop-blur-md px-3.5 py-2 rounded-full border border-industrial-steel shadow-elevated"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 z-20 flex items-center space-x-2.5 bg-industrial-dark/80 backdrop-blur-md px-3.5 py-2 rounded-full border border-industrial-steel shadow-elevated">
             <button
               type="button"
               onClick={handlePrevSlide}

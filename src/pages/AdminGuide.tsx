@@ -342,13 +342,12 @@ export const AdminGuide: React.FC = () => {
       livePath: '/contact',
       liveName: 'Homepage Carousel, Navigation & Contact (/contact)',
       icon: Settings,
-      summary: 'Manage the 5-slide rotating hero carousel with optional click redirect links, show/hide website tabs, update phone, WhatsApp, email, office name, and Google Maps.',
+      summary: 'Manage the 5-slide rotating hero carousel, show/hide website tabs, update phone, WhatsApp, email, office name, and Google Maps.',
       whatItDoes:
-        'This is the master command center for the entire website. Here you configure the homepage background slideshow and click destinations, toggle public visibility for any page, and update official company contact information.',
+        'This is the master command center for the entire website. Here you configure the homepage background slideshow, toggle public visibility for any page, and update official company contact information.',
       stepByStep: [
         'Open "Site Settings" in the sidebar.',
         'Hero Carousel Section: Upload or paste 5 rotating industrial photos. Click "Upload Photo" to select a file from your computer, or "Reset to Curated Defaults" if needed.',
-        'Click Redirect Links: Optionally enter a destination link for any slide (e.g. internal pages like /products, /capabilities, /documents, or external websites like https://...). When customers click the slide photo, they are redirected automatically.',
         'Website Tabs Visibility: Click any tab button (Visible / Hidden) to immediately show or hide that whole page from the public navigation and footer.',
         'Contact Details: Update Phone Number, Mobile / WhatsApp, and Sales Email.',
         'Office & Legal Name: Set official company name ("Infinite Hardware Tech. Pvt. Ltd.") and physical plant address.',
@@ -357,7 +356,6 @@ export const AdminGuide: React.FC = () => {
       ],
       liveEffects: [
         'The homepage hero cycles through your 5 photos every 5 seconds with gentle crossfade and pause on hover.',
-        'Clicking any linked photo takes the visitor directly to that target page or website.',
         'Instantly adds or removes entire tabs from the top header navigation, mobile drawer, and footer.',
         'If a tab is hidden, visitors who type its URL directly are smoothly redirected home.',
         'Instantly updates phone & email in the header, footer, and contact page.',
