@@ -118,77 +118,41 @@ export const Home: React.FC = () => {
     return defaultHeroCarouselImages;
   }, [effectiveSettings?.heroCarouselImages, config.heroImages]);
 
-  // Slide 0 is the static IFWPL sister company showcase, followed by the dynamic CMS hardware slides
-  const carouselSlides = useMemo(() => {
-    const ifwplSlide = {
-      image: '/ifwpl-facility.jpg',
-      isIfwpl: true,
-      eyebrow: '',
-      heading: 'Beyond Hardware: Discover Our Steel Fabrication Expertise',
-      subheading: '',
-      description:
-        'Our engineering capabilities extend beyond specialized hardware manufacturing. Since 2021, Infinite Fusion Works Pvt. Ltd. (IFWPL) has been strengthening our presence in structural steel fabrication, delivering solutions for bridges, infrastructure and industrial projects. With technical expertise, modern manufacturing facilities and a commitment to precision and quality, we continue to expand our engineering capabilities.',
-      primaryCtaText: 'Explore IFWPL',
-      primaryCtaLink: 'https://ifwpl.com',
-      isExternal: true,
-      secondaryCtaText: '',
-      secondaryCtaLink: '',
-    };
-
-    const dynamicSlides = heroImages.map((img) => ({
-      image: img,
-      isIfwpl: false,
-      eyebrow: config.heroEyebrow,
-      heading: config.heroHeading,
-      subheading: '',
-      description: config.heroDescription,
-      primaryCtaText: config.primaryCtaText,
-      primaryCtaLink: config.primaryCtaLink,
-      isExternal: false,
-      secondaryCtaText: config.secondaryCtaText,
-      secondaryCtaLink: config.secondaryCtaLink,
-    }));
-
-    return [ifwplSlide, ...dynamicSlides];
-  }, [heroImages, config]);
-
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const activeSlide = carouselSlides[currentSlide] || carouselSlides[0];
-
   // Auto-advance carousel every 5 seconds
   useEffect(() => {
-    if (carouselSlides.length <= 1 || isPaused) return;
+    if (heroImages.length <= 1 || isPaused) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [carouselSlides.length, isPaused]);
+  }, [heroImages.length, isPaused]);
 
   // Guard against out-of-bounds if slides array updates dynamically
   useEffect(() => {
-    if (currentSlide >= carouselSlides.length) {
+    if (currentSlide >= heroImages.length) {
       setCurrentSlide(0);
     }
-  }, [carouselSlides.length, currentSlide]);
+  }, [heroImages.length, currentSlide]);
 
   // Preload the next carousel slide in background so crossfade is instant
   useEffect(() => {
-    if (carouselSlides.length > 1) {
-      const nextIdx = (currentSlide + 1) % carouselSlides.length;
+    if (heroImages.length > 1) {
+      const nextIdx = (currentSlide + 1) % heroImages.length;
       const nextImg = new Image();
-      const rawUrl = carouselSlides[nextIdx].image;
+      const rawUrl = heroImages[nextIdx];
       nextImg.src = rawUrl.startsWith('http') ? optimizeImageUrl(rawUrl, 1280, 70) : rawUrl;
     }
-  }, [currentSlide, carouselSlides]);
+  }, [currentSlide, heroImages]);
 
   const handlePrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length);
+    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    setCurrentSlide((prev) => (prev + 1) % heroImages.length);
   };
 
   const renderHeroHeading = (heading?: string) => {
@@ -226,14 +190,14 @@ export const Home: React.FC = () => {
       >
         {/* Background Slides with Smooth Crossfade */}
         <div className="absolute inset-0 z-0">
-          {carouselSlides.map((slide, idx) => {
+          {heroImages.map((img, idx) => {
             const isInitial = idx === 0;
             const isCurrent = idx === currentSlide;
-            const isNext = idx === (currentSlide + 1) % carouselSlides.length;
+            const isNext = idx === (currentSlide + 1) % heroImages.length;
             const shouldRender = isInitial || isCurrent || isNext;
-            const imgSrc = slide.image.startsWith('http')
-              ? optimizeImageUrl(slide.image, 1280, 70)
-              : slide.image;
+            const imgSrc = img.startsWith('http')
+              ? optimizeImageUrl(img, 1280, 70)
+              : img;
 
             return (
               <div
@@ -245,7 +209,7 @@ export const Home: React.FC = () => {
                 {shouldRender && (
                   <img
                     src={imgSrc}
-                    alt={slide.isIfwpl ? 'Infinite Fusion Works (IFWPL) Facility' : `Hero Slide ${idx}`}
+                    alt={`Hero Slide ${idx + 1}`}
                     loading={isInitial ? 'eager' : 'lazy'}
                     decoding="async"
                     fetchPriority={isInitial ? 'high' : 'low'}
@@ -264,58 +228,36 @@ export const Home: React.FC = () => {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-28 w-full">
           <div className="max-w-3xl">
-            {activeSlide.eyebrow ? (
+            {config.heroEyebrow ? (
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-industrial-slate border border-industrial-steel text-industrial-orange text-xs font-bold uppercase tracking-wider mb-4 sm:mb-6">
                 <ShieldCheck className="w-4 h-4 text-industrial-orange" />
-                <span>{activeSlide.eyebrow}</span>
+                <span>{config.heroEyebrow}</span>
               </div>
             ) : null}
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-4 sm:mb-6">
-              {activeSlide.isIfwpl ? (
-                <span>Beyond Hardware: Discover Our Steel Fabrication Expertise</span>
-              ) : (
-                renderHeroHeading(activeSlide.heading)
-              )}
+              {renderHeroHeading(config.heroHeading)}
             </h1>
 
-            {activeSlide.subheading && (
-              <p className="text-base sm:text-xl font-bold text-industrial-orange mb-4 sm:mb-6 leading-snug">
-                {activeSlide.subheading}
-              </p>
-            )}
-
             <p className="text-base sm:text-xl text-gray-300 font-normal leading-relaxed mb-6 sm:mb-8 max-w-2xl">
-              {activeSlide.description}
+              {config.heroDescription}
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              {activeSlide.isExternal ? (
-                <a
-                  href={activeSlide.primaryCtaLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md min-h-[44px] cursor-pointer group"
-                >
-                  <span>{activeSlide.primaryCtaText}</span>
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </a>
-              ) : (
-                <Link
-                  to={showProducts ? activeSlide.primaryCtaLink : showContact ? '/contact' : showAbout ? '/about' : '/'}
-                  className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md min-h-[44px]"
-                >
-                  <span>{showProducts ? activeSlide.primaryCtaText : showContact ? 'Contact Sales Desk' : 'Explore About Us'}</span>
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-              )}
+              <Link
+                to={showProducts ? config.primaryCtaLink : showContact ? '/contact' : showAbout ? '/about' : '/'}
+                className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md min-h-[44px]"
+              >
+                <span>{showProducts ? config.primaryCtaText : showContact ? 'Contact Sales Desk' : 'Explore About Us'}</span>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
 
-              {!activeSlide.isIfwpl && showContact && activeSlide.secondaryCtaLink === '/contact' && (
+              {showContact && config.secondaryCtaLink === '/contact' && (
                 <Link
                   to="/contact"
                   className="inline-flex items-center justify-center px-6 py-3.5 rounded text-base font-bold text-white bg-industrial-slate hover:bg-industrial-steel border border-industrial-steel transition-all min-h-[44px]"
                 >
-                  <span>{activeSlide.secondaryCtaText}</span>
+                  <span>{config.secondaryCtaText}</span>
                 </Link>
               )}
             </div>
@@ -323,7 +265,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Carousel Indicators & Controls */}
-        {carouselSlides.length > 1 && (
+        {heroImages.length > 1 && (
           <div className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 z-20 flex items-center space-x-2.5 bg-industrial-dark/80 backdrop-blur-md px-3.5 py-2 rounded-full border border-industrial-steel shadow-elevated">
             <button
               type="button"
@@ -335,7 +277,7 @@ export const Home: React.FC = () => {
             </button>
 
             <div className="flex items-center space-x-1.5 px-1">
-              {carouselSlides.map((_, idx) => (
+              {heroImages.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -360,6 +302,78 @@ export const Home: React.FC = () => {
             </button>
           </div>
         )}
+      </section>
+
+      {/* Beyond Hardware: Infinite Fusion Works (IFWPL) Feature Sub-Section */}
+      <section className="bg-white border-b border-industrial-border py-12 sm:py-16 lg:py-20 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Content Column */}
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded bg-orange-50 border border-orange-200 text-industrial-orange text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-industrial-orange" />
+                <span>Sister Company &amp; Advanced Fabrication</span>
+              </div>
+
+              <div>
+                <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-industrial-dark tracking-tight leading-tight">
+                  Our Expertise Goes Beyond Hardware
+                </h2>
+                <p className="text-base sm:text-xl font-bold text-industrial-orange mt-2 sm:mt-3 leading-snug">
+                  Discover our capabilities in structural steel fabrication.
+                </p>
+              </div>
+
+              <p className="text-sm sm:text-base text-industrial-muted font-normal leading-relaxed">
+                Our engineering capabilities extend beyond specialized hardware manufacturing. Since 2021, Infinite Fusion Works Pvt. Ltd. (IFWPL) has been strengthening our presence in structural steel fabrication, delivering solutions for bridges, infrastructure and industrial projects. With technical expertise, modern manufacturing facilities and a commitment to precision and quality, we continue to expand our engineering capabilities.
+              </p>
+
+              <div className="pt-2 sm:pt-4">
+                <a
+                  href="https://ifwpl.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-6 py-3.5 rounded text-sm sm:text-base font-bold text-white bg-industrial-orange hover:bg-industrial-orange-hover transition-all shadow-md group cursor-pointer min-h-[44px]"
+                >
+                  <span>Explore IFWPL</span>
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Right Facility Photo Column */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-2xl overflow-hidden border border-industrial-border shadow-elevated bg-gray-100 group">
+                <img
+                  src="/ifwpl-facility.jpg"
+                  alt="Infinite Fusion Works Pvt. Ltd. (IFWPL) Structural Steel Fabrication Facility"
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-[320px] sm:h-[380px] lg:h-[420px] object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-industrial-dark/85 via-industrial-dark/30 to-transparent pointer-events-none" />
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-[11px] font-bold text-industrial-orange uppercase tracking-wider">
+                        Fabrication Plant
+                      </div>
+                      <div className="text-sm sm:text-base font-bold text-white">
+                        Infinite Fusion Works Pvt. Ltd.
+                      </div>
+                    </div>
+                    <span className="text-[10px] bg-industrial-orange/90 text-white font-bold px-2 py-0.5 rounded shadow-xs">
+                      Since 2021
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-gray-300 mt-1">
+                    Bridges, infrastructure &amp; heavy industrial steel fabrication
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Product Categories */}
